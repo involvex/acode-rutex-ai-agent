@@ -14,19 +14,23 @@ const DROPDOWN_PROVIDERS = [
 	'gemini',
 	'openrouter',
 	'qwen',
+	'opencode',
+	'kilo',
 ] as const satisfies readonly Provider[]
 
 type DropdownProvider = (typeof DROPDOWN_PROVIDERS)[number]
 
 const modelMetaCache: Partial<Record<Provider, ProviderModelMeta[]>> = {}
 
-const getProviderModels = (provider: Provider): ProviderModelMeta[] => {
+const getProviderModels = async (
+	provider: Provider,
+): Promise<ProviderModelMeta[]> => {
 	const cached = modelMetaCache[provider]
 	if (cached) return cached
 
 	try {
-		const models = (require(`../chats/models/${provider}_models`).default ??
-			[]) as ProviderModelMeta[]
+		const mod = await import(`../chats/models/${provider}_models`)
+		const models = (mod.default ?? []) as ProviderModelMeta[]
 		modelMetaCache[provider] = models
 		return models
 	} catch {
@@ -133,6 +137,22 @@ export const settingsContainer = (container: HTMLElement) => {
 		container,
 		'#setting-openrouter-site-name',
 	)
+	const modelOpenCodeTrigger = getElement<HTMLButtonElement>(
+		container,
+		'#setting-model-opencode-btn',
+	)
+	const modelKiloTrigger = getElement<HTMLButtonElement>(
+		container,
+		'#setting-model-kilo-btn',
+	)
+	const modelInfoOpenCode = getElement<HTMLElement>(
+		container,
+		'#setting-model-info-opencode',
+	)
+	const modelInfoKilo = getElement<HTMLElement>(
+		container,
+		'#setting-model-info-kilo',
+	)
 
 	const modelTriggers: Record<DropdownProvider, HTMLButtonElement> = {
 		openai: modelOpenAITrigger,
@@ -141,6 +161,8 @@ export const settingsContainer = (container: HTMLElement) => {
 		gemini: modelGeminiTrigger,
 		qwen: modelQwenTrigger,
 		openrouter: modelOpenRouterTrigger,
+		opencode: modelOpenCodeTrigger,
+		kilo: modelKiloTrigger,
 	}
 
 	const modelInfoEls: Record<DropdownProvider, HTMLElement> = {
@@ -150,6 +172,8 @@ export const settingsContainer = (container: HTMLElement) => {
 		gemini: modelInfoGemini,
 		qwen: modelInfoQwen,
 		openrouter: modelInfoOpenRouter,
+		opencode: modelInfoOpenCode,
+		kilo: modelInfoKilo,
 	}
 
 	let settingsDialogOpen = false
@@ -180,23 +204,27 @@ export const settingsContainer = (container: HTMLElement) => {
 		return temp.innerHTML
 	}
 
-	const findModelMeta = (
+	const findModelMeta = async (
 		provider: Provider,
 		modelId: string,
-	): ProviderModelMeta | null => {
+	): Promise<ProviderModelMeta | null> => {
 		if (!modelId.trim()) return null
-		return (
-			getProviderModels(provider).find(model => model.id === modelId) ?? null
-		)
+		const models = await getProviderModels(provider)
+		return models.find(model => model.id === modelId) ?? null
 	}
 
-	const getModelLabel = (provider: Provider, modelId: string): string =>
-		findModelMeta(provider, modelId)?.label ?? modelId
+	const getModelLabel = async (
+		provider: Provider,
+		modelId: string,
+	): Promise<string> => {
+		const meta = await findModelMeta(provider, modelId)
+		return meta?.label ?? modelId
+	}
 
-	const renderModelInfo = (provider: DropdownProvider): void => {
+	const renderModelInfo = async (provider: DropdownProvider): Promise<void> => {
 		const infoEl = modelInfoEls[provider]
 		const selectedModel = aiSettings.models[provider]
-		const modelMeta = findModelMeta(provider, selectedModel)
+		const modelMeta = await findModelMeta(provider, selectedModel)
 
 		if (!modelMeta) {
 			infoEl.innerHTML =
@@ -222,41 +250,54 @@ export const settingsContainer = (container: HTMLElement) => {
       `
 	}
 
-	const refreshSettingsUI = (): void => {
+	const refreshSettingsUI = async (): Promise<void> => {
 		modelSel.value = aiSettings.provider
 		providerInput.value = aiSettings.provider
 		maxTokensInput.value = String(aiSettings.maxTokens)
 		temperatureInput.value = String(aiSettings.temperature)
-		modelOpenAITrigger.textContent = getModelLabel(
+		modelOpenAITrigger.textContent = await getModelLabel(
 			'openai',
 			aiSettings.models.openai,
 		)
 		openAIHostInput.value = aiSettings.openaiHost
 		customModelOpenaiInput.value = aiSettings.models.openai
-		modelDeepSeekTrigger.textContent = getModelLabel(
+		modelDeepSeekTrigger.textContent = await getModelLabel(
 			'deepseek',
 			aiSettings.models.deepseek,
 		)
-		modelClaudeTrigger.textContent = getModelLabel(
+		modelClaudeTrigger.textContent = await getModelLabel(
 			'claude',
 			aiSettings.models.claude,
 		)
-		modelGeminiTrigger.textContent = getModelLabel(
+		modelGeminiTrigger.textContent = await getModelLabel(
 			'gemini',
 			aiSettings.models.gemini,
 		)
-		modelQwenTrigger.textContent = getModelLabel('qwen', aiSettings.models.qwen)
+		modelQwenTrigger.textContent = await getModelLabel(
+			'qwen',
+			aiSettings.models.qwen,
+		)
 		modelOllamaInput.value = aiSettings.models.ollama
-		modelOpenRouterTrigger.textContent = getModelLabel(
+		modelOpenRouterTrigger.textContent = await getModelLabel(
 			'openrouter',
 			aiSettings.models.openrouter,
 		)
-		renderModelInfo('openai')
-		renderModelInfo('deepseek')
-		renderModelInfo('claude')
-		renderModelInfo('gemini')
-		renderModelInfo('qwen')
-		renderModelInfo('openrouter')
+		await renderModelInfo('openai')
+		await renderModelInfo('deepseek')
+		await renderModelInfo('claude')
+		await renderModelInfo('gemini')
+		await renderModelInfo('qwen')
+		await renderModelInfo('openrouter')
+		modelOpenCodeTrigger.textContent = await getModelLabel(
+			'opencode',
+			aiSettings.models.opencode,
+		)
+		await renderModelInfo('opencode')
+		modelKiloTrigger.textContent = await getModelLabel(
+			'kilo',
+			aiSettings.models.kilo,
+		)
+		await renderModelInfo('kilo')
 		ollamaHostInput.value = aiSettings.ollamaHost
 		openRouterSiteUrlInput.value = aiSettings.openRouterSiteUrl
 		openRouterSiteNameInput.value = aiSettings.openRouterSiteName
@@ -274,11 +315,12 @@ export const settingsContainer = (container: HTMLElement) => {
 		modelSearchOptions.innerHTML = ''
 	}
 
-	const renderModelMenuOptions = (): void => {
+	const renderModelMenuOptions = async (): Promise<void> => {
 		if (!modelMenuProvider) return
 
 		const search = modelSearchInput.value.trim().toLowerCase()
-		const options = getProviderModels(modelMenuProvider).filter(model => {
+		const allModels = await getProviderModels(modelMenuProvider)
+		const options = allModels.filter(model => {
 			if (!search) return true
 			return (
 				model.id.toLowerCase().includes(search) ||
@@ -305,7 +347,7 @@ export const settingsContainer = (container: HTMLElement) => {
 				if (!modelMenuProvider) return
 				aiSettings.models[modelMenuProvider] = model.id
 
-				if (modelMenuProvider == 'openai')
+				if (modelMenuProvider === 'openai')
 					customModelOpenaiInput.value = model.id
 
 				persistSettings()

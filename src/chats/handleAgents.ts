@@ -52,7 +52,7 @@ export async function* sendChat(
 	let StreamModel: StreamFunction
 
 	try {
-		StreamModel = (await require(`./providers/${provider}`)).default
+		StreamModel = (await import(`./providers/${provider}`)).default
 	} catch {
 		clg(`Unknown provider: "${provider}"`)
 		throw new Error()

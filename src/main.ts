@@ -74,8 +74,8 @@ if (window.acode) {
 		PLUGIN_ID,
 		async (
 			baseUrl: string,
-			_$page: Acode.WCPage,
-			_options: Acode.PluginInitOptions,
+			_$page: Acode.WCPage, // eslint-disable-line @typescript-eslint/no-unused-vars
+			_options: Acode.PluginInitOptions, // eslint-disable-line @typescript-eslint/no-unused-vars
 		) => {
 			// const { cacheFile, cacheFileUrl } = options
 

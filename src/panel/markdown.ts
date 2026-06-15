@@ -9,28 +9,29 @@ import bash from 'highlight.js/lib/languages/bash'
 import xml from 'highlight.js/lib/languages/xml'
 import php from 'highlight.js/lib/languages/php'
 import css from 'highlight.js/lib/languages/css'
+import type {LanguageFn} from 'highlight.js'
 import hljs from 'highlight.js/lib/core'
 import {escapeHtml} from './utils'
 
 const TOOL_TAG_REGEX =
 	/<system_injected_preview>[\s\S]*?<\/system_injected_preview>/gi
 
-hljs.registerLanguage('bash', bash as any)
-hljs.registerLanguage('sh', bash as any)
-hljs.registerLanguage('shell', bash as any)
-hljs.registerLanguage('css', css as any)
-hljs.registerLanguage('js', javascript as any)
-hljs.registerLanguage('javascript', javascript as any)
-hljs.registerLanguage('json', json as any)
-hljs.registerLanguage('md', markdown as any)
-hljs.registerLanguage('markdown', markdown as any)
-hljs.registerLanguage('php', php as any)
-hljs.registerLanguage('py', python as any)
-hljs.registerLanguage('python', python as any)
-hljs.registerLanguage('ts', typescript as any)
-hljs.registerLanguage('typescript', typescript as any)
-hljs.registerLanguage('html', xml as any)
-hljs.registerLanguage('xml', xml as any)
+hljs.registerLanguage('bash', bash as unknown as LanguageFn)
+hljs.registerLanguage('sh', bash as unknown as LanguageFn)
+hljs.registerLanguage('shell', bash as unknown as LanguageFn)
+hljs.registerLanguage('css', css as unknown as LanguageFn)
+hljs.registerLanguage('js', javascript as unknown as LanguageFn)
+hljs.registerLanguage('javascript', javascript as unknown as LanguageFn)
+hljs.registerLanguage('json', json as unknown as LanguageFn)
+hljs.registerLanguage('md', markdown as unknown as LanguageFn)
+hljs.registerLanguage('markdown', markdown as unknown as LanguageFn)
+hljs.registerLanguage('php', php as unknown as LanguageFn)
+hljs.registerLanguage('py', python as unknown as LanguageFn)
+hljs.registerLanguage('python', python as unknown as LanguageFn)
+hljs.registerLanguage('ts', typescript as unknown as LanguageFn)
+hljs.registerLanguage('typescript', typescript as unknown as LanguageFn)
+hljs.registerLanguage('html', xml as unknown as LanguageFn)
+hljs.registerLanguage('xml', xml as unknown as LanguageFn)
 
 const escapeHtml2 = (value: string): string => {
 	const map: Record<string, string> = {
@@ -174,7 +175,7 @@ export const renderMarkdown = async (raw: string): Promise<string> => {
 			.trimEnd()
 		const encoded = btoa(unescape(encodeURIComponent(code)))
 
-		let highlighted = code
+		let highlighted: string
 		try {
 			highlighted = hljs.getLanguage(language)
 				? hljs.highlight(code, {language}).value
@@ -260,7 +261,7 @@ export const renderEditedFileLines = (
 	const getLanguage = hljs.getLanguage(language)
 
 	const highlight = (code: string) => {
-		let highlighted = ''
+		let highlighted: string
 		try {
 			highlighted = getLanguage
 				? hljs.highlight(code, {language}).value

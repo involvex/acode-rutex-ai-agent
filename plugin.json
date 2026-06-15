@@ -1,11 +1,11 @@
 {
 	"$schema": "https://acode.app/schema/plugin/v0.1.0.json",
-	"id": "hallofcodes.rutex.coding_agent",
+	"id": "com.involvex.coding_agent",
 	"name": "RutexAI Coding Agent",
 	"main": "dist/main.js",
 	"version": "0.0.8",
 	"readme": "./readme.md",
-	"repository": "https://github.com/hallofcodes/acode-ai-agent-plugin",
+	"repository": "https://github.com/involvex/acode-ai-agent-plugin",
 	"icon": "icon.png",
 	"keywords": [
 		"ai",
@@ -21,8 +21,8 @@
 	"minVersionCode": 958,
 	"price": 0,
 	"author": {
-		"name": "dconco",
-		"github": "dconco"
+		"name": "involvex",
+		"github": "involvex"
 	},
 	"contributors": [
 		{

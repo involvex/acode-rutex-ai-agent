@@ -107,7 +107,8 @@ export function closeEditedFilesDialog() {
 	filesList.innerHTML = ''
 }
 
-function revertEditedLines(history: OldEditedFileLines[], file: string) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function revertEditedLines(history: OldEditedFileLines[], _file: string) {
 	// --- Reverse the array so we can start reverting the file edits right from the very last ---
 	// --- Filter and remove edits we can't revert ---
 	const reversedHistory = history.reverse().filter(entry => entry.revertable)

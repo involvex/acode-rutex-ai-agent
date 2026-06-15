@@ -21,7 +21,9 @@ export default async function* (
 		max_tokens: aiSettings.maxTokens,
 		temperature: aiSettings.temperature,
 		system: aiSettings.systemInstruction,
-		messages: messages.map(m => ({role: m.role, content: m.content}) as any),
+		messages: messages
+			.filter(m => m.role !== 'tool')
+			.map(m => ({role: m.role as 'user' | 'assistant', content: m.content})),
 		signal,
 	})
 

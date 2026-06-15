@@ -1,6 +1,6 @@
 import {PLUGIN_ID} from './configs/constants'
-import {renderPanel} from './panel'
 import Icon from './icons/icon.svg'
+import {renderPanel} from './panel'
 
 const sideBarApps = acode.require('sidebarApps')
 let scrollBottom: undefined | (() => void) = undefined

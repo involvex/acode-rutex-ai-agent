@@ -4,6 +4,23 @@ import {tools} from '../tools/ollama_tools'
 import {aiSettings} from '../settings'
 
 // ─────────────────────────────────────────────
+// Ollama — local type definitions
+// ─────────────────────────────────────────────
+
+interface OllamaMessageChunk {
+	model?: string
+	message?: {
+		content?: string
+		tool_calls?: Array<{
+			id?: string
+			function: {name: string; arguments: Record<string, unknown>}
+		}>
+	}
+	prompt_eval_count?: number
+	eval_count?: number
+}
+
+// ─────────────────────────────────────────────
 // Ollama
 // ─────────────────────────────────────────────
 
@@ -21,7 +38,7 @@ export default async function* (
 	}
 
 	let fullText = ''
-	let chunk: any = null
+	let chunk: OllamaMessageChunk | null = null
 
 	const chat_messages = [...messages]
 
@@ -53,14 +70,16 @@ export default async function* (
 				body,
 				signal,
 			})
-		} catch (err: any) {
-			if (err.name === 'AbortError') break
+		} catch (err: unknown) {
+			if (err instanceof Error && err.name === 'AbortError') break
 
-			throw new Error(
-				`Failed to connect to Ollama at ${host}. ${
-					err?.message ?? 'Network error — check CORS or host.'
-				}`,
-			)
+			const message =
+				err instanceof Error
+					? err.message
+					: 'Network error — check CORS or host.'
+			throw new Error(`Failed to connect to Ollama at ${host}. ${message}`, {
+				cause: err,
+			})
 		}
 
 		if (!response.ok) {
@@ -72,8 +91,11 @@ export default async function* (
 		if (!reader) throw new Error('No response body from Ollama')
 
 		const decoder = new TextDecoder()
-		const toolCalls: any[] = []
-		const seenToolCallIds = new Set()
+		const toolCalls: Array<{
+			id?: string
+			function: {name: string; arguments: string}
+		}> = []
+		const seenToolCallIds = new Set<string>()
 
 		try {
 			while (signal?.aborted === false) {
@@ -87,24 +109,31 @@ export default async function* (
 
 				for (const line of lines) {
 					try {
-						chunk = JSON.parse(line)
+						const parsed: OllamaMessageChunk = JSON.parse(line)
+						chunk = parsed
 
-						if (chunk.message?.content) {
-							fullText += chunk.message.content
+						if (parsed.message?.content) {
+							fullText += parsed.message.content
 							yield {
 								type: 'text',
-								delta: chunk.message.content,
-								model: chunk.model ?? model,
+								delta: parsed.message.content,
+								model: parsed.model ?? model,
 							}
 						}
 
-						if (chunk.message?.tool_calls?.length) {
-							for (const tc of chunk.message.tool_calls) {
+						if (parsed.message?.tool_calls?.length) {
+							for (const tc of parsed.message.tool_calls) {
 								const id = tc.id ?? JSON.stringify(tc)
 
 								if (!seenToolCallIds.has(id)) {
 									seenToolCallIds.add(id)
-									toolCalls.push(tc)
+									toolCalls.push({
+										id: tc.id,
+										function: {
+											name: tc.function.name,
+											arguments: JSON.stringify(tc.function.arguments),
+										},
+									})
 								}
 							}
 						}
@@ -134,10 +163,12 @@ export default async function* (
 
 			try {
 				const toolFunction: ToolsFunction = (
-					await require(`../tools/functions/${call.function.name}`)
+					await import(`../tools/functions/${call.function.name}`)
 				).default
 
-				const chunkedResult = toolFunction(call.function.arguments)
+				const chunkedResult = toolFunction(
+					JSON.parse(call.function.arguments) as Record<string, unknown>,
+				)
 
 				for await (const toolChunk of chunkedResult) {
 					if (toolChunk.toSave) {
@@ -158,7 +189,7 @@ export default async function* (
 						break
 					}
 				}
-			} catch (e: any) {
+			} catch (e: unknown) {
 				const errorMessage =
 					e instanceof Error ? e.message : String(e || 'Unknown error')
 

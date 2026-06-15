@@ -2,10 +2,18 @@
 // Types
 // ─────────────────────────────────────────────
 
+export interface ToolCall {
+	id?: string
+	function: {
+		name: string
+		arguments: string
+	}
+}
+
 export interface ChatMessage {
 	role: 'user' | 'assistant' | 'system' | 'tool'
 	content: string
-	tool_calls?: any[]
+	tool_calls?: ToolCall[]
 	tool_name?: string
 }
 
@@ -17,6 +25,8 @@ export type Provider =
 	| 'ollama'
 	| 'openrouter'
 	| 'qwen'
+	| 'opencode'
+	| 'kilo'
 
 export interface Usage {
 	inputTokens: number

@@ -27,7 +27,12 @@ export default async function* (
 			stream: true,
 			messages: [
 				{role: 'system', content: aiSettings.systemInstruction},
-				...messages.map(m => ({role: m.role, content: m.content}) as any),
+				...messages
+					.filter(m => m.role !== 'tool')
+					.map(m => ({
+						role: m.role as 'system' | 'user' | 'assistant',
+						content: m.content,
+					})),
 			],
 		},
 		{signal},

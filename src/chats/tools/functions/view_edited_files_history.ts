@@ -3,7 +3,6 @@ import {
 	retrieveEditedFileHistory,
 } from '../../history/chatHistory'
 import {EditedFilesHistoryProps, ToolsReturnType} from './types'
-import {getRelativePath} from './utils'
 
 export default async function* ({
 	filterByIds = undefined,

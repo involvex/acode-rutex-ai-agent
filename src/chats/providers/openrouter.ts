@@ -22,6 +22,7 @@ export default async function* (
 
 	// Mirror the provider pattern used elsewhere: plain incoming history,
 	// then provider-local tool loop with function_call_output continuations.
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const chat_messages: any[] = messages.map(m => ({
 		role: m.role,
 		content: m.content,
@@ -71,13 +72,14 @@ export default async function* (
 					break
 
 				// A new output item started — capture id and call_id for function_calls
-				case 'response.output_item.added':
+				case 'response.output_item.added': {
 					const item = chunk.item
 
 					if (item.type === 'function_call' && item.id) {
 						pendingToolCalls[item.id] = item
 					}
 					break
+				}
 
 				case 'response.function_call_arguments.done':
 					if (pendingToolCalls[chunk.itemId] ?? null) {
@@ -85,14 +87,15 @@ export default async function* (
 					}
 					break
 
-				case 'response.completed':
+				case 'response.completed': {
 					// chunk.response.usage has token counts
-					;((usage.inputTokens += chunk.response.usage?.inputTokens ?? 0),
-						(usage.outputTokens += chunk.response.usage?.outputTokens ?? 0),
-						(usage.totalTokens += chunk.response.usage?.totalTokens ?? 0),
-						// chunk.response.model has the resolved model name
-						(resolvedModel = chunk.response.model || model))
+					usage.inputTokens += chunk.response.usage?.inputTokens ?? 0
+					usage.outputTokens += chunk.response.usage?.outputTokens ?? 0
+					usage.totalTokens += chunk.response.usage?.totalTokens ?? 0
+					// chunk.response.model has the resolved model name
+					resolvedModel = chunk.response.model || model
 					break
+				}
 			}
 		}
 
@@ -107,7 +110,7 @@ export default async function* (
 
 			try {
 				const toolFunction: ToolsFunction = (
-					await require(`../tools/functions/${tc.name}`)
+					await import(`../tools/functions/${tc.name}`)
 				).default
 
 				const args = safeJson(tc.arguments)
@@ -133,7 +136,7 @@ export default async function* (
 						break
 					}
 				}
-			} catch (e: any) {
+			} catch (e: unknown) {
 				const errorMessage =
 					e instanceof Error ? e.message : String(e || 'Unknown error')
 
@@ -156,10 +159,9 @@ export default async function* (
 	}
 }
 
-function safeJson(text: string) {
+function safeJson(text: string): Record<string, unknown> {
 	try {
-		const output = JSON.parse(text)
-		return output
+		return JSON.parse(text) as Record<string, unknown>
 	} catch {
 		return {}
 	}

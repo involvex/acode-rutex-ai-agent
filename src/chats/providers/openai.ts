@@ -10,6 +10,27 @@ import OpenAI from 'openai'
 // For coding agent tasks: gpt-5.3-codex | gpt-5.2-codex
 // ─────────────────────────────────────────────
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+interface OpenAIResponse {
+	model?: string
+	output_text?: string
+	output?: Array<{
+		type: string
+		name?: string
+		arguments?: string
+		call_id?: string
+		content?: Array<{type: string; text?: string}>
+	}>
+	usage?: {
+		input_tokens?: number
+		output_tokens?: number
+		total_tokens?: number
+		prompt_tokens?: number
+		completion_tokens?: number
+	}
+}
+
 export default async function* (
 	model: string,
 	messages: ChatMessage[],
@@ -25,7 +46,6 @@ export default async function* (
 
 	const client = new OpenAI(config)
 
-	// Keep incoming history plain; tool state is built only inside this loop.
 	const input: any[] = messages
 		.filter(m => m.role !== 'tool')
 		.map(m => ({role: m.role, content: m.content}))
@@ -45,7 +65,7 @@ export default async function* (
 	while (true) {
 		if (signal?.aborted) break
 
-		const response: any = await client.responses.create(
+		const response: OpenAIResponse = (await client.responses.create(
 			{
 				model,
 				instructions: aiSettings.systemInstruction,
@@ -57,7 +77,7 @@ export default async function* (
 				input,
 			},
 			{signal},
-		)
+		)) as any
 
 		resolvedModel = response?.model ?? resolvedModel
 
@@ -80,15 +100,13 @@ export default async function* (
 
 		const toolCalls = Array.isArray(response?.output)
 			? response.output.filter(
-					(item: any) => item?.type === 'function_call' && item?.name,
+					item => item?.type === 'function_call' && item?.name,
 				)
 			: []
 
 		if (!toolCalls.length) break
 
-		// Preserve the model output items (including reasoning/function calls)
-		// before appending function_call_output items.
-		input.push(...response.output)
+		input.push(...(response.output ?? []))
 
 		for (const call of toolCalls) {
 			const toolName = call?.name
@@ -96,7 +114,7 @@ export default async function* (
 
 			try {
 				const toolFunction: ToolsFunction = (
-					await require(`../tools/functions/${toolName}`)
+					await import(`../tools/functions/${toolName}`)
 				).default
 
 				const rawArgs = call?.arguments ?? '{}'
@@ -124,7 +142,7 @@ export default async function* (
 					call_id: call.call_id,
 					output: resultContent || '[NO RESULT]',
 				})
-			} catch (e: any) {
+			} catch (e: unknown) {
 				const errorMessage =
 					e instanceof Error ? e.message : String(e || 'Unknown error')
 
@@ -146,15 +164,17 @@ export default async function* (
 	}
 }
 
-function safeJsonParse(raw: string): Record<string, any> {
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+function safeJsonParse(raw: string): Record<string, unknown> {
 	try {
-		return JSON.parse(raw)
+		return JSON.parse(raw) as Record<string, unknown>
 	} catch {
 		return {}
 	}
 }
 
-function getResponseText(response: any): string {
+function getResponseText(response: OpenAIResponse): string {
 	if (response?.output_text) return response.output_text
 	if (!Array.isArray(response?.output)) return ''
 

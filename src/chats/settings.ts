@@ -81,6 +81,8 @@ export const aiSettings: AISettings = {
 		qwen: 'qwen3-coder-plus', // qwen3.5
 		ollama: 'qwen3.5', // any model pulled locally
 		openrouter: 'qwen/qwen3-coder', // <provider>/<model> — 300+ available
+		opencode: 'mimo-v2.5-free', // free tier models
+		kilo: 'kilo-auto/free', // free tier via Kilo Gateway
 	},
 
 	// ── API keys ─────────────────────────────────
@@ -92,6 +94,8 @@ export const aiSettings: AISettings = {
 		qwen: '',
 		ollama: '',
 		openrouter: '',
+		opencode: '',
+		kilo: '',
 	},
 
 	// ── Provider Labels ─────────────────────────────────
@@ -103,6 +107,8 @@ export const aiSettings: AISettings = {
 		qwen: 'Qwen',
 		ollama: 'Ollama',
 		openrouter: 'OpenRouter',
+		opencode: 'OpenCode Zen',
+		kilo: 'Kilo Gateway',
 	},
 
 	// ── System instruction ───────────────────────

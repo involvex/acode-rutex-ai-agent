@@ -47,7 +47,7 @@ export function copyText(
 	button?: HTMLButtonElement | null,
 	doc: Document = document,
 ): void {
-	const textToCopy = text.replace(
+	const cleaned = text.replace(
 		/<system_injected_preview>[\s\S]*?<\/system_injected_preview>/gi,
 		'\n',
 	)
@@ -66,7 +66,7 @@ export function copyText(
 
 	const fallbackCopy = (): void => {
 		const textarea = Object.assign(doc.createElement('textarea'), {
-			value: text,
+			value: cleaned,
 		})
 		textarea.style.cssText = 'position:fixed;opacity:0'
 		doc.body.appendChild(textarea)
@@ -77,7 +77,7 @@ export function copyText(
 	}
 
 	if (navigator.clipboard) {
-		navigator.clipboard.writeText(text).then(done).catch(fallbackCopy)
+		navigator.clipboard.writeText(cleaned).then(done).catch(fallbackCopy)
 	} else {
 		fallbackCopy()
 	}

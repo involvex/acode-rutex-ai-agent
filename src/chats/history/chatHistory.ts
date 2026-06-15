@@ -143,7 +143,9 @@ export const saveChatHistory = async (messages: ChatMessage[]) => {
 		await withStore('readwrite', CHAT_HISTORY_STORE, store =>
 			store.put({id: currentChatID, messages} as ChatHistoryRecord),
 		)
-	} catch {}
+	} catch {
+		// ignored — IndexedDB may fail silently
+	}
 }
 
 export const retrieveChatHistory = async (
@@ -152,7 +154,7 @@ export const retrieveChatHistory = async (
 	if (chatID) {
 		currentChatID = chatID
 		localStorage.setItem(LAST_ACTIVE_CHAT_HISTORY_KEY, currentChatID)
-	} else if (currentChatID == '') {
+	} else if (currentChatID === '') {
 		currentChatID = localStorage.getItem(LAST_ACTIVE_CHAT_HISTORY_KEY) || ''
 	}
 
@@ -170,7 +172,7 @@ export const retrieveChatHistory = async (
 
 export const deleteChatHistory = async (chatID: string | null = null) => {
 	if (!chatID) chatID = currentChatID
-	if (chatID == '') return
+	if (chatID === '') return
 
 	if (chatID === currentChatID) currentChatID = ''
 
@@ -180,7 +182,9 @@ export const deleteChatHistory = async (chatID: string | null = null) => {
 			store.delete(chatID),
 		)
 		editChatHistoryList(lists => delete lists[chatID])
-	} catch {}
+	} catch {
+		// ignored
+	}
 }
 
 export const deleteAllChatHistory = async () => {
@@ -189,12 +193,14 @@ export const deleteAllChatHistory = async () => {
 		await deleteEditedFileHistory(null)
 
 		// --- Clear the history list and reset current chat ID ---
-		editChatHistoryList(lists => {
-			lists = {}
+		editChatHistoryList(_lists => {
+			void _lists
 		})
 
 		currentChatID = ''
-	} catch {}
+	} catch {
+		// ignored
+	}
 }
 
 // --- IMPLEMENTATION FOR EDITED FILE HISTORY ---
@@ -216,7 +222,9 @@ export const saveEditedFileHistory = async (
 				createdAt: Date.now(),
 			} as EditedFileHistoryRecord),
 		)
-	} catch {}
+	} catch {
+		// ignored
+	}
 
 	return id
 }
@@ -299,5 +307,7 @@ export const deleteEditedFileHistory = async (
 				store.delete(deleteBy.id),
 			)
 		}
-	} catch {}
+	} catch {
+		// ignored
+	}
 }

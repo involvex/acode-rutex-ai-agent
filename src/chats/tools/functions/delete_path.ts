@@ -1,7 +1,7 @@
 import {getRelativePath} from './utils'
 import {CreateFileInfo} from './types'
 
-export default async function* ({uri, content = ''}: CreateFileInfo) {
+export default async function* ({uri}: CreateFileInfo) {
 	// --- START FILE READ ---
 	const fs = acode.require('fs')
 

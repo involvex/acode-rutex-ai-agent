@@ -19,12 +19,11 @@ import {
 } from './chats/settings'
 import {getWorkspaceFolders, getActiveFiles} from './helpers/workspace'
 import type {AIPanelAPI, ChatMessage, ContextFile} from './panel/types'
-import {renderMarkdown, renderEditedFileLines} from './panel/markdown'
-import {OldEditedFileLines} from './chats/tools/functions/types'
 import {processSingleToolCallTag} from './panel/commandParser'
 import {ChatMessage as AgentChatMessage} from './chats/types'
 import {settingsContainer} from './panel/settingsContainer'
 import {historyContainer} from './panel/historyContainer'
+import {renderMarkdown} from './panel/markdown'
 import {sendChat} from './chats/handleAgents'
 import panel from './panel.html'
 
@@ -165,7 +164,9 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 		openContextMenu(event.currentTarget as HTMLElement)
 
 	function renderCtxBar(): void {
-		ctxBar.querySelectorAll('.ctx-chip').forEach(chip => chip.remove())
+		for (const chip of ctxBar.querySelectorAll<HTMLElement>('.ctx-chip')) {
+			chip.remove()
+		}
 
 		ctxFiles.forEach((file, index) => {
 			const chip = createEl('div')
@@ -257,9 +258,11 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 	}
 
 	async function renderAll(): Promise<void> {
-		msgsInner
-			.querySelectorAll('.msg-row, .thinking-row')
-			.forEach(node => node.remove())
+		for (const node of msgsInner.querySelectorAll<HTMLElement>(
+			'.msg-row, .thinking-row',
+		)) {
+			node.remove()
+		}
 
 		emptyState.style.display = messages.length === 0 ? 'flex' : 'none'
 
@@ -382,9 +385,11 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 		stopIcon.style.display = 'none'
 		sendBtn.classList.remove('stop')
 		sendBtn.disabled = false
-		msgsInner
-			.querySelectorAll('.thinking-row, .stream-cursor')
-			.forEach(node => node.remove())
+		for (const node of msgsInner.querySelectorAll<HTMLElement>(
+			'.thinking-row, .stream-cursor',
+		)) {
+			node.remove()
+		}
 	}
 
 	// ─────────────────────────────────────────────
@@ -429,8 +434,7 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 			})
 
 		const messagesForAI = filteredChatMessages.map(
-			(m: ChatMessage, index: number): AgentChatMessage => {
-				const isLastMessage = index === filteredChatMessages.length - 1
+			(m: ChatMessage): AgentChatMessage => {
 				let ctx = ''
 
 				/*if (isLastMessage) {
@@ -561,7 +565,7 @@ After editing any files you should re-read them to make sure there's no error in
 					}
 				}
 			}
-		} catch (e: any) {
+		} catch (e: unknown) {
 			if (e instanceof Error && e.name === 'AbortError') {
 				return
 			}
@@ -571,10 +575,13 @@ After editing any files you should re-read them to make sure there's no error in
 			completeMessage = completeMessage.trim()
 
 			if (!liveContent) liveContent = initializeLiveResponse()
-			if (liveContent)
-				liveContent.innerHTML += `<div class="error">${escapeHtml(
-					e.message || String(e || 'There was an unknown error'),
-				)}</div>`
+			if (liveContent) {
+				const errorMsg =
+					e instanceof Error
+						? e.message
+						: String(e ?? 'There was an unknown error')
+				liveContent.innerHTML += `<div class="error">${escapeHtml(errorMsg)}</div>`
+			}
 		} finally {
 			if (liveContent) {
 				const actionBtns = createEl('div')

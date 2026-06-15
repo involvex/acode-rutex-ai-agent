@@ -1,5 +1,5 @@
+import {Usage, StreamChunk, ChatMessage, ToolCall} from '../types'
 import {tools as ollamaTools} from '../tools/ollama_tools'
-import {Usage, StreamChunk, ChatMessage} from '../types'
 import {ToolsFunction} from '../tools/functions/types'
 import {GoogleGenAI} from '@google/genai'
 import {aiSettings} from '../settings'
@@ -8,6 +8,29 @@ import {aiSettings} from '../settings'
 // Gemini
 // ─────────────────────────────────────────────
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+interface GeminiStreamChunk {
+	text?: string
+	modelVersion?: string
+	candidates?: Array<{
+		content?: {
+			role?: string
+			parts?: Array<{text?: string; functionCall?: Record<string, unknown>}>
+		}
+	}>
+	functionCalls?: Array<{
+		id?: string
+		name: string
+		args?: Record<string, unknown>
+	}>
+	usageMetadata?: {
+		promptTokenCount?: number
+		candidatesTokenCount?: number
+		totalTokenCount?: number
+	}
+}
+
 export default async function* (
 	model: string,
 	messages: ChatMessage[],
@@ -15,8 +38,6 @@ export default async function* (
 ): AsyncGenerator<StreamChunk> {
 	const ai = new GoogleGenAI({apiKey: aiSettings.apiKeys.gemini})
 
-	// Mirror Ollama flow: incoming messages are plain history; tool state is built
-	// only inside this provider execution loop.
 	const turnMessages: ChatMessage[] = messages.map(m => ({
 		role: m.role,
 		content: m.content,
@@ -26,8 +47,6 @@ export default async function* (
 		.filter(m => m.role === 'user' || m.role === 'assistant')
 		.map(m => {
 			if (m.role === 'assistant') {
-				// Keep historical assistant turns as text-only. Function call parts from
-				// prior turns can carry thought signatures that are not available here.
 				return {role: 'model', parts: [{text: m.content || ''}]}
 			}
 
@@ -48,7 +67,7 @@ export default async function* (
 	}
 
 	let fullText = ''
-	let chunk: any = null
+	let chunk: GeminiStreamChunk | null = null
 	let usage: Usage = {inputTokens: 0, outputTokens: 0, totalTokens: 0}
 
 	while (true) {
@@ -60,27 +79,35 @@ export default async function* (
 			config,
 		})
 
-		const toolCalls: any[] = []
+		const toolCalls: ToolCall[] = []
 		const seenToolCallIds = new Set<string>()
 		let turnText = ''
 		let lastModelContent: any = null
 
-		for await (chunk of stream) {
+		for await (const rawChunk of stream) {
 			if (signal?.aborted) break
 
-			const candidateContent = (chunk as any)?.candidates?.[0]?.content
+			chunk = rawChunk as unknown as GeminiStreamChunk
+
+			const candidateContent = chunk?.candidates?.[0]?.content
 			if (candidateContent?.parts?.length) {
-				lastModelContent = candidateContent
+				lastModelContent = chunk.candidates?.[0] ?? null
 			}
 
-			const functionCalls = (chunk as any).functionCalls as any[] | undefined
+			const functionCalls = chunk.functionCalls
 			if (functionCalls?.length) {
 				for (const call of functionCalls) {
 					const id =
 						call?.id ?? `${call?.name}:${JSON.stringify(call?.args ?? {})}`
 					if (seenToolCallIds.has(id)) continue
 					seenToolCallIds.add(id)
-					toolCalls.push(call)
+					toolCalls.push({
+						id: call.id,
+						function: {
+							name: call.name,
+							arguments: JSON.stringify(call.args ?? {}),
+						},
+					})
 				}
 			}
 
@@ -91,15 +118,7 @@ export default async function* (
 				yield {type: 'text', delta, model: chunk.modelVersion || model}
 			}
 
-			const meta = (
-				chunk as unknown as {
-					usageMetadata?: {
-						promptTokenCount?: number
-						candidatesTokenCount?: number
-						totalTokenCount?: number
-					}
-				}
-			).usageMetadata
+			const meta = chunk.usageMetadata
 
 			if (meta) {
 				usage = {
@@ -118,7 +137,6 @@ export default async function* (
 			tool_calls: toolCalls,
 		})
 
-		// Reuse the model-emitted content so functionCall thought signatures are preserved.
 		if (lastModelContent?.parts?.length) {
 			contents.push(lastModelContent)
 		} else {
@@ -128,8 +146,8 @@ export default async function* (
 				fallbackParts.push({
 					functionCall: {
 						id: call.id,
-						name: call.name,
-						args: call.args ?? {},
+						name: call.function.name,
+						args: JSON.parse(call.function.arguments),
 					},
 				})
 			}
@@ -143,14 +161,18 @@ export default async function* (
 		const functionResponses: any[] = []
 
 		for (const call of toolCalls) {
-			if (!call?.name) continue
+			const toolName = call.function.name
+			if (!toolName) continue
 
 			try {
 				const toolFunction: ToolsFunction = (
-					await require(`../tools/functions/${call.name}`)
+					await import(`../tools/functions/${toolName}`)
 				).default
 
-				const args = call.args ?? {}
+				const args = JSON.parse(call.function.arguments) as Record<
+					string,
+					unknown
+				>
 				const chunkedResult = toolFunction(args)
 
 				let resultContent = ''
@@ -160,7 +182,7 @@ export default async function* (
 						yield {
 							type: 'tool',
 							delta: toolChunk.toSave,
-							model: chunk.modelVersion || model,
+							model: chunk?.modelVersion || model,
 						}
 					}
 
@@ -171,29 +193,33 @@ export default async function* (
 				}
 
 				functionResponses.push({
-					id: call.id,
-					name: call.name,
-					response: {result: resultContent || '[NO RESULT]'},
+					functionResponse: {
+						id: call.id,
+						name: toolName,
+						response: {result: resultContent || '[NO RESULT]'},
+					},
 				})
 
 				turnMessages.push({
 					role: 'tool',
-					tool_name: call.name,
+					tool_name: toolName,
 					content: resultContent || '[NO RESULT]',
 				})
-			} catch (e: any) {
+			} catch (e: unknown) {
 				const errorMessage =
 					e instanceof Error ? e.message : String(e || 'Unknown error')
 
 				functionResponses.push({
-					id: call.id,
-					name: call.name,
-					response: {result: `[ERROR] ${errorMessage}`},
+					functionResponse: {
+						id: call.id,
+						name: toolName,
+						response: {result: `[ERROR] ${errorMessage}`},
+					},
 				})
 
 				turnMessages.push({
 					role: 'tool',
-					tool_name: call.name,
+					tool_name: toolName,
 					content: `[ERROR] ${errorMessage}`,
 				})
 			}
@@ -201,8 +227,8 @@ export default async function* (
 
 		contents.push({
 			role: 'user',
-			parts: functionResponses.map(functionResponse => ({
-				functionResponse,
+			parts: functionResponses.map(fr => ({
+				functionResponse: fr.functionResponse,
 			})),
 		})
 	}
@@ -211,7 +237,9 @@ export default async function* (
 		type: 'done',
 		text: fullText,
 		provider: 'gemini',
-		model: chunk.modelVersion || model,
+		model: chunk?.modelVersion || model,
 		usage,
 	}
 }
+
+/* eslint-enable @typescript-eslint/no-explicit-any */
