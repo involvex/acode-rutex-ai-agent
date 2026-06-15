@@ -1,4 +1,4 @@
-import { ProviderModelMeta } from './types'
+import {ProviderModelMeta} from './types'
 
 export default [
 	{
@@ -7,7 +7,7 @@ export default [
 		contextWindow: '64K tokens',
 		maxOutputTokens: '8K tokens',
 		bestFor: ['General coding', 'Q&A', 'Low-cost conversations'],
-		notes: 'Good default for everyday tasks.'
+		notes: 'Good default for everyday tasks.',
 	},
 	{
 		id: 'deepseek-reasoner',
@@ -15,6 +15,6 @@ export default [
 		contextWindow: '64K tokens',
 		maxOutputTokens: '8K tokens',
 		bestFor: ['Reasoning-heavy problems', 'Math/logic', 'Stepwise analysis'],
-		notes: 'Emphasizes reasoning over speed.'
-	}
+		notes: 'Emphasizes reasoning over speed.',
+	},
 ] as const satisfies ProviderModelMeta[]

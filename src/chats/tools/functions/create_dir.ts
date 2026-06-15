@@ -1,12 +1,12 @@
-import { CreateDirInfo } from './types'
-import { getRelativePath } from './utils'
+import {getRelativePath} from './utils'
+import {CreateDirInfo} from './types'
 
-export default async function* ({ uri }: CreateDirInfo) {
+export default async function* ({uri}: CreateDirInfo) {
 	// --- SEND SIGNAL TO PANEL THAT FILE IS BEING READ ---
 	const relativePath = getRelativePath(uri)
 
 	const toolCalling = JSON.stringify({
-		header: `FOLDER CREATED: ${relativePath}`
+		header: `FOLDER CREATED: ${relativePath}`,
 	})
 	const toSave = `<system_injected_preview>${toolCalling}</system_injected_preview>`
 
@@ -28,5 +28,5 @@ export default async function* ({ uri }: CreateDirInfo) {
 
 	const result = await fs(parentDir).createDirectory(dirName)
 
-	yield { result, toSave }
+	yield {result, toSave}
 }

@@ -10,19 +10,13 @@
 
 	#ai-panel {
 		--accent: var(--active-color, var(--button-background-color, #1337ec));
-		--accent-dim: var(
-			--button-active-color,
-			var(--active-icon-color, #0d28b8)
-		);
+		--accent-dim: var(--button-active-color, var(--active-icon-color, #0d28b8));
 		--accent-hi: var(--active-color, var(--button-background-color, #3d5ff5));
 		--accent-glow: color-mix(in srgb, var(--accent) 15%, transparent);
 		--accent-glow2: color-mix(in srgb, var(--accent) 8%, transparent);
 		--bg: var(--primary-color, #0e0e14);
 		--bg-card: var(--secondary-color, #13131c);
-		--bg-input: var(
-			--popup-background-color,
-			var(--secondary-color, #1a1a26)
-		);
+		--bg-input: var(--popup-background-color, var(--secondary-color, #1a1a26));
 		--bg-hover: color-mix(in srgb, var(--text) 6%, transparent);
 		--bg-code: var(--secondary-color, #0a0a12);
 		--border: var(--border-color, rgba(255, 255, 255, 0.07));
@@ -1485,32 +1479,57 @@
 			<span class="brand-name">Rutex Coding <em>Agent</em></span>
 		</div>
 		<div class="header-actions">
-			<button class="hbtn" id="new-chat-btn" title="New chat">
+			<button
+				class="hbtn"
+				id="new-chat-btn"
+				title="New chat"
+			>
 				<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
 			</button>
-			<button class="hbtn" id="history-btn" title="History">
+			<button
+				class="hbtn"
+				id="history-btn"
+				title="History"
+			>
 				<svg viewBox="0 0 24 24">
-					<circle cx="12" cy="12" r="9" />
+					<circle
+						cx="12"
+						cy="12"
+						r="9"
+					/>
 					<polyline points="12 7 12 12 16 14" />
 				</svg>
 			</button>
-			<button class="hbtn" id="settings-btn" title="Settings">
+			<button
+				class="hbtn"
+				id="settings-btn"
+				title="Settings"
+			>
 				<svg viewBox="0 0 24 24">
-					<circle cx="12" cy="12" r="3" />
+					<circle
+						cx="12"
+						cy="12"
+						r="3"
+					/>
 					<path
-						d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+						d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+					/>
 				</svg>
 			</button>
 		</div>
 	</div>
 
 	<!-- Context Bar -->
-	<div class="ctx-bar" id="ctx-bar">
+	<div
+		class="ctx-bar"
+		id="ctx-bar"
+	>
 		<span class="ctx-label">CTX</span>
 		<button
 			class="ctx-add-btn"
 			id="ctx-add-btn"
-			title="Add current file as context">
+			title="Add current file as context"
+		>
 			<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
 			add file
 		</button>
@@ -1519,7 +1538,10 @@
 	<!-- Model Bar -->
 	<div class="model-bar">
 		<span class="model-label">MODEL</span>
-		<select class="model-select" id="model-select">
+		<select
+			class="model-select"
+			id="model-select"
+		>
 			<option value="gemini">Gemini</option>
 			<option value="claude">Claude</option>
 			<option value="deepseek">DeepSeek</option>
@@ -1531,24 +1553,43 @@
 	</div>
 
 	<!-- Edited Files -->
-	<div class="edited-files-bar" id="edited-files-bar">
+	<div
+		class="edited-files-bar"
+		id="edited-files-bar"
+	>
 		<div class="edited-files-head">
-			<button class="edited-files-bulk-btn" type="button">
+			<button
+				class="edited-files-bulk-btn"
+				type="button"
+			>
 				<span id="accept-all-btn">Accept all</span> /
 				<span id="reject-all-btn">Reject all</span>
 			</button>
 		</div>
-		<div class="edited-files-list" id="edited-files-list"></div>
+		<div
+			class="edited-files-list"
+			id="edited-files-list"
+		></div>
 	</div>
 
 	<!-- Messages -->
-	<div class="msgs-wrap" id="msgs-wrap">
-		<div class="msgs-inner" id="msgs-inner">
-			<div class="empty-state" id="empty-state">
+	<div
+		class="msgs-wrap"
+		id="msgs-wrap"
+	>
+		<div
+			class="msgs-inner"
+			id="msgs-inner"
+		>
+			<div
+				class="empty-state"
+				id="empty-state"
+			>
 				<div class="empty-icon-wrap">
 					<svg viewBox="0 0 24 24">
 						<path
-							d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+							d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+						/>
 					</svg>
 				</div>
 				<span class="empty-title">Ask anything</span>
@@ -1556,7 +1597,8 @@
 				<div class="suggestions">
 					<button
 						class="sug-chip"
-						data-prompt="Explain the selected code in detail">
+						data-prompt="Explain the selected code in detail"
+					>
 						<svg viewBox="0 0 24 24">
 							<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
 						</svg>
@@ -1564,24 +1606,34 @@
 					</button>
 					<button
 						class="sug-chip"
-						data-prompt="Find all bugs in my code and suggest fixes with examples">
+						data-prompt="Find all bugs in my code and suggest fixes with examples"
+					>
 						<svg viewBox="0 0 24 24">
-							<rect x="8" y="6" width="8" height="14" rx="4" />
-							<path
-								d="M19 13H5M12 6V2M7 9l-3-3M17 9l3-3M7 17l-3 3M17 17l3 3" />
+							<rect
+								x="8"
+								y="6"
+								width="8"
+								height="14"
+								rx="4"
+							/>
+							<path d="M19 13H5M12 6V2M7 9l-3-3M17 9l3-3M7 17l-3 3M17 17l3 3" />
 						</svg>
 						Find bugs &amp; suggest fixes
 					</button>
 					<button
 						class="sug-chip"
-						data-prompt="Refactor this code to be cleaner and more efficient">
+						data-prompt="Refactor this code to be cleaner and more efficient"
+					>
 						<svg viewBox="0 0 24 24">
 							<polyline points="23 4 23 10 17 10" />
 							<path d="M20.5 15a9 9 0 1 1-2.7-6.7L23 10" />
 						</svg>
 						Refactor for clarity
 					</button>
-					<button class="sug-chip" data-prompt="Write a function to ">
+					<button
+						class="sug-chip"
+						data-prompt="Write a function to "
+					>
 						<svg viewBox="0 0 24 24">
 							<polyline points="16 18 22 12 16 6" />
 							<polyline points="8 6 2 12 8 18" />
@@ -1604,13 +1656,29 @@
 					spellcheck="false"
 					autocomplete="off"
 					autocorrect="off"
-					autocapitalize="off"></textarea>
-				<button id="send-btn" title="Send (Enter)">
-					<svg id="send-icon" viewBox="0 0 24 24">
-						<line x1="22" y1="2" x2="11" y2="13" />
+					autocapitalize="off"
+				></textarea>
+				<button
+					id="send-btn"
+					title="Send (Enter)"
+				>
+					<svg
+						id="send-icon"
+						viewBox="0 0 24 24"
+					>
+						<line
+							x1="22"
+							y1="2"
+							x2="11"
+							y2="13"
+						/>
 						<polygon points="22 2 15 22 11 13 2 9 22 2" />
 					</svg>
-					<svg id="stop-icon" viewBox="0 0 24 24" style="display: none">
+					<svg
+						id="stop-icon"
+						viewBox="0 0 24 24"
+						style="display: none"
+					>
 						<rect
 							x="4"
 							y="4"
@@ -1618,7 +1686,8 @@
 							height="16"
 							rx="2"
 							fill="currentColor"
-							stroke="none" />
+							stroke="none"
+						/>
 					</svg>
 				</button>
 			</div>
@@ -1627,31 +1696,42 @@
 					<button
 						class="tbtn"
 						id="attach-btn"
-						title="Attach current file as context">
+						title="Attach current file as context"
+					>
 						<svg viewBox="0 0 24 24">
 							<path
-								d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+								d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
+							/>
 						</svg>
 					</button>
 					<button
 						class="tbtn"
 						id="sel-btn"
-						title="Insert editor selection">
+						title="Insert editor selection"
+					>
 						<svg viewBox="0 0 24 24">
-							<path
-								d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+							<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
 						</svg>
 					</button>
-					<button class="tbtn" id="clear-btn" title="Clear chat">
+					<button
+						class="tbtn"
+						id="clear-btn"
+						title="Clear chat"
+					>
 						<svg viewBox="0 0 24 24">
 							<polyline points="3 6 5 6 21 6" />
 							<path
-								d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6" />
+								d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"
+							/>
 							<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
 						</svg>
 					</button>
 				</div>
-				<span class="char-count" id="char-count">0</span>
+				<span
+					class="char-count"
+					id="char-count"
+					>0</span
+				>
 			</div>
 		</div>
 		<div class="input-footer">
@@ -1662,13 +1742,30 @@
 		</div>
 	</div>
 
-	<div class="settings-overlay" id="settings-dialog">
+	<div
+		class="settings-overlay"
+		id="settings-dialog"
+	>
 		<div class="settings-head">
 			<span class="settings-title">AI Settings</span>
-			<button class="settings-close" id="settings-close-btn" title="Close">
+			<button
+				class="settings-close"
+				id="settings-close-btn"
+				title="Close"
+			>
 				<svg viewBox="0 0 24 24">
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
+					<line
+						x1="18"
+						y1="6"
+						x2="6"
+						y2="18"
+					/>
+					<line
+						x1="6"
+						y1="6"
+						x2="18"
+						y2="18"
+					/>
 				</svg>
 			</button>
 		</div>
@@ -1676,10 +1773,15 @@
 			<div class="settings-sec">
 				<span class="settings-sec-title">General</span>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-provider"
+					<label
+						class="settings-label"
+						for="setting-provider"
 						>Active provider</label
 					>
-					<select class="settings-select" id="setting-provider">
+					<select
+						class="settings-select"
+						id="setting-provider"
+					>
 						<option value="gemini">Gemini</option>
 						<option value="claude">Claude</option>
 						<option value="deepseek">DeepSeek</option>
@@ -1690,7 +1792,9 @@
 					</select>
 				</div>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-max-tokens"
+					<label
+						class="settings-label"
+						for="setting-max-tokens"
 						>Max tokens</label
 					>
 					<input
@@ -1698,10 +1802,13 @@
 						id="setting-max-tokens"
 						type="number"
 						min="1"
-						step="1" />
+						step="1"
+					/>
 				</div>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-temperature"
+					<label
+						class="settings-label"
+						for="setting-temperature"
 						>Temperature</label
 					>
 					<input
@@ -1710,11 +1817,14 @@
 						type="number"
 						min="0"
 						max="1"
-						step="0.1" />
+						step="0.1"
+					/>
 				</div>
 				<div class="settings-row">
 					<span class="settings-label">Lifetime tokens used</span>
-					<span class="settings-token-value" id="setting-lifetime-tokens"
+					<span
+						class="settings-token-value"
+						id="setting-lifetime-tokens"
 						>0</span
 					>
 				</div>
@@ -1723,154 +1833,196 @@
 			<div class="settings-sec">
 				<span class="settings-sec-title">OpenAI</span>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-model-openai-btn"
+					<label
+						class="settings-label"
+						for="setting-model-openai-btn"
 						>Model</label
 					>
 					<button
 						class="settings-model-trigger"
 						id="setting-model-openai-btn"
-						type="button"></button>
+						type="button"
+					></button>
 					<div
 						class="settings-model-info"
-						id="setting-model-info-openai"></div>
+						id="setting-model-info-openai"
+					></div>
 				</div>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-custom-model-openai"
+					<label
+						class="settings-label"
+						for="setting-custom-model-openai"
 						>Custom Model</label
 					>
 					<input
 						class="settings-input"
 						id="setting-custom-model-openai"
-						type="text" />
+						type="text"
+					/>
 				</div>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-openai-host"
+					<label
+						class="settings-label"
+						for="setting-openai-host"
 						>Custom Host</label
 					>
 					<input
 						class="settings-input"
 						id="setting-openai-host"
-						type="text" />
+						type="text"
+					/>
 				</div>
 			</div>
 
 			<div class="settings-sec">
 				<span class="settings-sec-title">DeepSeek</span>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-model-deepseek-btn"
+					<label
+						class="settings-label"
+						for="setting-model-deepseek-btn"
 						>Model</label
 					>
 					<button
 						class="settings-model-trigger"
 						id="setting-model-deepseek-btn"
-						type="button"></button>
+						type="button"
+					></button>
 					<div
 						class="settings-model-info"
-						id="setting-model-info-deepseek"></div>
+						id="setting-model-info-deepseek"
+					></div>
 				</div>
 			</div>
 
 			<div class="settings-sec">
 				<span class="settings-sec-title">Claude</span>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-model-claude-btn"
+					<label
+						class="settings-label"
+						for="setting-model-claude-btn"
 						>Model</label
 					>
 					<button
 						class="settings-model-trigger"
 						id="setting-model-claude-btn"
-						type="button"></button>
+						type="button"
+					></button>
 					<div
 						class="settings-model-info"
-						id="setting-model-info-claude"></div>
+						id="setting-model-info-claude"
+					></div>
 				</div>
 			</div>
 
 			<div class="settings-sec">
 				<span class="settings-sec-title">Gemini</span>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-model-gemini-btn"
+					<label
+						class="settings-label"
+						for="setting-model-gemini-btn"
 						>Model</label
 					>
 					<button
 						class="settings-model-trigger"
 						id="setting-model-gemini-btn"
-						type="button"></button>
+						type="button"
+					></button>
 					<div
 						class="settings-model-info"
-						id="setting-model-info-gemini"></div>
+						id="setting-model-info-gemini"
+					></div>
 				</div>
 			</div>
 
 			<div class="settings-sec">
 				<span class="settings-sec-title">Qwen</span>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-model-qwen-btn"
+					<label
+						class="settings-label"
+						for="setting-model-qwen-btn"
 						>Model</label
 					>
 					<button
 						class="settings-model-trigger"
 						id="setting-model-qwen-btn"
-						type="button"></button>
+						type="button"
+					></button>
 					<div
 						class="settings-model-info"
-						id="setting-model-info-qwen"></div>
+						id="setting-model-info-qwen"
+					></div>
 				</div>
 			</div>
 
 			<div class="settings-sec">
 				<span class="settings-sec-title">Ollama</span>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-model-ollama"
+					<label
+						class="settings-label"
+						for="setting-model-ollama"
 						>Model</label
 					>
 					<input
 						class="settings-input"
 						id="setting-model-ollama"
-						type="text" />
+						type="text"
+					/>
 				</div>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-ollama-host"
+					<label
+						class="settings-label"
+						for="setting-ollama-host"
 						>Ollama host</label
 					>
 					<input
 						class="settings-input"
 						id="setting-ollama-host"
-						type="text" />
+						type="text"
+					/>
 				</div>
 			</div>
 
 			<div class="settings-sec">
 				<span class="settings-sec-title">OpenRouter</span>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-model-openrouter-btn"
+					<label
+						class="settings-label"
+						for="setting-model-openrouter-btn"
 						>Model</label
 					>
 					<button
 						class="settings-model-trigger"
 						id="setting-model-openrouter-btn"
-						type="button"></button>
+						type="button"
+					></button>
 					<div
 						class="settings-model-info"
-						id="setting-model-info-openrouter"></div>
+						id="setting-model-info-openrouter"
+					></div>
 				</div>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-openrouter-site-url"
+					<label
+						class="settings-label"
+						for="setting-openrouter-site-url"
 						>Site URL</label
 					>
 					<input
 						class="settings-input"
 						id="setting-openrouter-site-url"
-						type="url" />
+						type="url"
+					/>
 				</div>
 				<div class="settings-row">
-					<label class="settings-label" for="setting-openrouter-site-name"
+					<label
+						class="settings-label"
+						for="setting-openrouter-site-name"
 						>Site Name</label
 					>
 					<input
 						class="settings-input"
 						id="setting-openrouter-site-name"
-						type="text" />
+						type="text"
+					/>
 				</div>
 			</div>
 
@@ -1880,18 +2032,38 @@
 		</div>
 	</div>
 
-	<div class="settings-overlay" id="history-dialog">
+	<div
+		class="settings-overlay"
+		id="history-dialog"
+	>
 		<div class="settings-head">
 			<span class="settings-title">Chat History</span>
-			<button class="settings-close" id="history-close-btn" title="Close">
+			<button
+				class="settings-close"
+				id="history-close-btn"
+				title="Close"
+			>
 				<svg viewBox="0 0 24 24">
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
+					<line
+						x1="18"
+						y1="6"
+						x2="6"
+						y2="18"
+					/>
+					<line
+						x1="6"
+						y1="6"
+						x2="18"
+						y2="18"
+					/>
 				</svg>
 			</button>
 		</div>
 		<div class="settings-body">
-			<div class="history-list" id="history-list"></div>
+			<div
+				class="history-list"
+				id="history-list"
+			></div>
 		</div>
 	</div>
 </div>

@@ -1,10 +1,10 @@
-export const doc: { document: Document } = {
-	document: document
+export const doc: {document: Document} = {
+	document: document,
 }
 
 export const escapeHtml = (
 	value: string,
-	includeNL: boolean = false
+	includeNL: boolean = false,
 ): string => {
 	const pre = doc.document.createElement('pre')
 	pre.textContent = value
@@ -27,7 +27,7 @@ export const decodeBase64Safe = (value: string): string => {
 
 export const getElement = <T extends Element>(
 	root: ParentNode,
-	selector: string
+	selector: string,
 ): T => {
 	const found = root.querySelector(selector)
 	if (!found) {
@@ -45,11 +45,11 @@ export const getFileNameFromPath = (path: string): string => {
 export function copyText(
 	text: string,
 	button?: HTMLButtonElement | null,
-	doc: Document = document
+	doc: Document = document,
 ): void {
 	const textToCopy = text.replace(
 		/<system_injected_preview>[\s\S]*?<\/system_injected_preview>/gi,
-		'\n'
+		'\n',
 	)
 
 	const done = (): void => {
@@ -66,7 +66,7 @@ export function copyText(
 
 	const fallbackCopy = (): void => {
 		const textarea = Object.assign(doc.createElement('textarea'), {
-			value: text
+			value: text,
 		})
 		textarea.style.cssText = 'position:fixed;opacity:0'
 		doc.body.appendChild(textarea)

@@ -1,22 +1,26 @@
-import { escapeHtml } from './utils'
-import { renderEditedFileLines } from './markdown'
-import { DisplayToolsCallUsed } from '../chats/tools/functions/types'
-import { retrieveEditedFileHistory } from '../chats/history/chatHistory'
+import {retrieveEditedFileHistory} from '../chats/history/chatHistory'
+import {DisplayToolsCallUsed} from '../chats/tools/functions/types'
+import {renderEditedFileLines} from './markdown'
+import {escapeHtml} from './utils'
 
-const TOOL_TAG_REGEX = /<system_injected_preview>([\s\S]*?)<\/system_injected_preview>/gi
+const TOOL_TAG_REGEX =
+	/<system_injected_preview>([\s\S]*?)<\/system_injected_preview>/gi
 
 export async function processSingleToolCallTag(
-	tagText: string
-): Promise<{ html: string; editedFileHistoryId?: string }> {
-	const match = /<system_injected_preview>([\s\S]*?)<\/system_injected_preview>/i.exec(tagText)
-	if (!match) return { html: tagText }
+	tagText: string,
+): Promise<{html: string; editedFileHistoryId?: string}> {
+	const match =
+		/<system_injected_preview>([\s\S]*?)<\/system_injected_preview>/i.exec(
+			tagText,
+		)
+	if (!match) return {html: tagText}
 
 	const payload = (match[1] || '').trim()
 	try {
 		const parsedCommand = JSON.parse(payload)
 		return convertToolCallsToHTML(parsedCommand as DisplayToolsCallUsed)
 	} catch {
-		return { html: escapeHtml(tagText) }
+		return {html: escapeHtml(tagText)}
 	}
 }
 
@@ -36,7 +40,7 @@ export async function processToolCallsInText(text: string): Promise<string> {
 		out += text.slice(lastIndex, start)
 
 		// Replace this tag with command result
-		const { html } = await processSingleToolCallTag(fullMatch)
+		const {html} = await processSingleToolCallTag(fullMatch)
 		out += html
 
 		lastIndex = end
@@ -48,29 +52,34 @@ export async function processToolCallsInText(text: string): Promise<string> {
 }
 
 async function convertToolCallsToHTML(
-	command: DisplayToolsCallUsed
-): Promise<{ html: string; editedFileHistoryId?: string }> {
+	command: DisplayToolsCallUsed,
+): Promise<{html: string; editedFileHistoryId?: string}> {
 	if ('header' in command) {
 		return {
 			html: `<div class="code-block">
 						<div class="code-header">
 							<span class="code-lang edited">${escapeHtml(command.header)}</span>
 						</div>
-					</div>`
+					</div>`,
 		}
 	}
 
 	if ('path' in command && command.editedFileHistoryId) {
 		const result = await retrieveEditedFileHistory({
-			ids: [command.editedFileHistoryId]
+			ids: [command.editedFileHistoryId],
 		})
 
-		if (!result.length) return { html: '' }
+		if (!result.length) return {html: ''}
 
 		return {
-			html: renderEditedFileLines(result[0]?.content ?? [], command.path, command.totalAdded, command.totalRemoved),
+			html: renderEditedFileLines(
+				result[0]?.content ?? [],
+				command.path,
+				command.totalAdded,
+				command.totalRemoved,
+			),
 		}
 	}
 
-	return { html: '' }
+	return {html: ''}
 }

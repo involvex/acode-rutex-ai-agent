@@ -1,32 +1,32 @@
-import panel from './panel.html'
-import { ChatMessage as AgentChatMessage } from './chats/types'
-import { renderMarkdown, renderEditedFileLines } from './panel/markdown'
-import type { AIPanelAPI, ChatMessage, ContextFile } from './panel/types'
+import {
+	retrieveChatHistory,
+	deleteChatHistory,
+	saveChatHistory,
+	newChatHistory,
+} from './chats/history/chatHistory'
 import {
 	decodeBase64Safe,
 	escapeHtml,
 	doc,
 	getElement,
 	copyText,
-	stripTrailingDetailsBlock
+	stripTrailingDetailsBlock,
 } from './panel/utils'
-import { settingsContainer } from './panel/settingsContainer'
-import { historyContainer } from './panel/historyContainer'
-import {
-	retrieveChatHistory,
-	deleteChatHistory,
-	saveChatHistory,
-	newChatHistory
-} from './chats/history/chatHistory'
-import { sendChat } from './chats/handleAgents'
 import {
 	addLifetimeTokens,
 	aiSettings,
-	formatTokenNumber
+	formatTokenNumber,
 } from './chats/settings'
-import { processSingleToolCallTag } from './panel/commandParser'
-import { getWorkspaceFolders, getActiveFiles } from './helpers/workspace'
-import { OldEditedFileLines } from './chats/tools/functions/types'
+import {getWorkspaceFolders, getActiveFiles} from './helpers/workspace'
+import type {AIPanelAPI, ChatMessage, ContextFile} from './panel/types'
+import {renderMarkdown, renderEditedFileLines} from './panel/markdown'
+import {OldEditedFileLines} from './chats/tools/functions/types'
+import {processSingleToolCallTag} from './panel/commandParser'
+import {ChatMessage as AgentChatMessage} from './chats/types'
+import {settingsContainer} from './panel/settingsContainer'
+import {historyContainer} from './panel/historyContainer'
+import {sendChat} from './chats/handleAgents'
+import panel from './panel.html'
 
 declare global {
 	interface Window {
@@ -41,7 +41,7 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 	doc.document = container.ownerDocument || document
 
 	const createEl = <T extends keyof HTMLElementTagNameMap>(
-		tag: T
+		tag: T,
 	): HTMLElementTagNameMap[T] => doc.document.createElement(tag)
 
 	container.style.display = 'flex'
@@ -64,10 +64,10 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 	const clearBtn = getElement<HTMLButtonElement>(container, '#clear-btn')
 	const lifetimeTokensEl = getElement<HTMLElement>(
 		container,
-		'#setting-lifetime-tokens'
+		'#setting-lifetime-tokens',
 	)
 	const scrollableElements = container.querySelectorAll<HTMLElement>(
-		'#ai-panel, #msgs-wrap'
+		'#ai-panel, #msgs-wrap',
 	)
 
 	scrollableElements.forEach(el => {
@@ -150,7 +150,7 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 		const confirm = acode.require('confirm')
 		const res = await confirm(
 			'Are you sure?',
-			'This will delete this message history forever! And all the edited file history records will be cleared.'
+			'This will delete this message history forever! And all the edited file history records will be cleared.',
 		)
 
 		if (res) {
@@ -177,8 +177,7 @@ const renderPanel = (container: HTMLElement): (() => void) => {
        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
      </button>`
 
-			const removeButton =
-				chip.querySelector<HTMLButtonElement>('.ctx-remove')
+			const removeButton = chip.querySelector<HTMLButtonElement>('.ctx-remove')
 			if (removeButton) {
 				removeButton.addEventListener('click', () => {
 					ctxFiles.splice(index, 1)
@@ -209,11 +208,11 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 	function openContextMenu(triggerEl: HTMLElement): void {
 		ctxMenuEl.innerHTML = ''
 		const attachedKeys = new Set(
-			ctxFiles.map(file => `${file.id}::${file.uri}`)
+			ctxFiles.map(file => `${file.id}::${file.uri}`),
 		)
 
 		const filteredActiveFiles = getActiveFiles().filter(
-			file => !attachedKeys.has(`${file.id}::${file.uri}`)
+			file => !attachedKeys.has(`${file.id}::${file.uri}`),
 		)
 
 		if (!filteredActiveFiles.length) {
@@ -241,7 +240,7 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 		const fromTop = triggerRect.top < panelRect.top + panelRect.height / 2
 		const left = Math.min(
 			Math.max(triggerRect.left - panelRect.left, 4),
-			Math.max(panelRect.width - 184, 4)
+			Math.max(panelRect.width - 184, 4),
 		)
 
 		ctxMenuEl.style.left = `${left}px`
@@ -282,7 +281,7 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 	async function addFinishUp(
 		row: HTMLDivElement,
 		idx: number,
-		text: string
+		text: string,
 	): Promise<void> {
 		const aiContent = row.querySelector<HTMLElement>('.ai-content')
 		const copyBtn = row.querySelector<HTMLButtonElement>('.copy-btn')
@@ -291,7 +290,7 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 		attachCodeButtons(aiContent)
 
 		copyBtn?.addEventListener('click', () =>
-			copyText(text, copyBtn, doc.document)
+			copyText(text, copyBtn, doc.document),
 		)
 
 		regenBtn?.addEventListener('click', async () => {
@@ -303,7 +302,7 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 
 	async function buildRow(
 		msg: ChatMessage,
-		idx: number
+		idx: number,
 	): Promise<HTMLDivElement> {
 		const row = createEl('div')
 		row.className = `msg-row ${msg.role}`
@@ -320,8 +319,8 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 						msg.ctxName?.map(
 							ctx =>
 								`<div class="user-ctx-chip"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>${escapeHtml(
-									ctx
-								)}</div>`
+									ctx,
+								)}</div>`,
 						) ?? ''
 					}
 					${escapeHtml(msg.text, true)}
@@ -407,7 +406,7 @@ const renderPanel = (container: HTMLElement): (() => void) => {
 		sendBtn.disabled = false
 
 		let aiIdx: number | null = null
-		let liveRow: HTMLDivElement = createEl('div')
+		const liveRow: HTMLDivElement = createEl('div')
 		let liveContent: HTMLDivElement | null = null
 		let saveDebounceTimer: NodeJS.Timeout | undefined
 
@@ -468,9 +467,9 @@ After editing any files you should re-read them to make sure there's no error in
 
 				return {
 					role: m.role,
-					content: ctx + m.text
+					content: ctx + m.text,
 				}
-			}
+			},
 		)
 
 		const initializeLiveResponse = (): HTMLDivElement | null => {
@@ -496,7 +495,7 @@ After editing any files you should re-read them to make sure there's no error in
 						messages.push({
 							role: 'assistant',
 							text: '',
-							modelUsed: chunk.model
+							modelUsed: chunk.model,
 						})
 						aiIdx = messages.length - 1
 					}
@@ -513,9 +512,7 @@ After editing any files you should re-read them to make sure there's no error in
 
 							if (dd.editedFileHistoryId) {
 								message.editedFileHistoryIds ??= []
-								message.editedFileHistoryIds.push(
-									dd.editedFileHistoryId
-								)
+								message.editedFileHistoryIds.push(dd.editedFileHistoryId)
 							}
 
 							liveContent.querySelector('.stream-cursor')?.remove()
@@ -542,12 +539,11 @@ After editing any files you should re-read them to make sure there's no error in
 					if (liveContent && aiIdx !== null) {
 						if (chunk.provider === 'qwen') {
 							const cleanedMessage = stripTrailingDetailsBlock(
-								completeMessage || messages[aiIdx].text
+								completeMessage || messages[aiIdx].text,
 							)
 							messages[aiIdx].text = cleanedMessage
 							completeMessage = cleanedMessage
-							liveContent.innerHTML =
-								await renderMarkdown(cleanedMessage)
+							liveContent.innerHTML = await renderMarkdown(cleanedMessage)
 						}
 
 						if (saveDebounceTimer) {
@@ -557,7 +553,7 @@ After editing any files you should re-read them to make sure there's no error in
 
 						addLifetimeTokens(chunk.usage.totalTokens)
 						lifetimeTokensEl.textContent = formatTokenNumber(
-							aiSettings.lifetimeTokensUsed
+							aiSettings.lifetimeTokensUsed,
 						)
 
 						messages[aiIdx].modelUsed = chunk.model
@@ -577,7 +573,7 @@ After editing any files you should re-read them to make sure there's no error in
 			if (!liveContent) liveContent = initializeLiveResponse()
 			if (liveContent)
 				liveContent.innerHTML += `<div class="error">${escapeHtml(
-					e.message || String(e || 'There was an unknown error')
+					e.message || String(e || 'There was an unknown error'),
 				)}</div>`
 		} finally {
 			if (liveContent) {
@@ -593,8 +589,8 @@ After editing any files you should re-read them to make sure there's no error in
 						</button>
                </div>
                <span class="msg-model-tag">${escapeHtml(
-						messages[aiIdx ?? -1]?.modelUsed || ''
-					)}</span>
+									messages[aiIdx ?? -1]?.modelUsed || '',
+								)}</span>
 				`
 
 				liveRow.appendChild(actionBtns)
@@ -632,7 +628,7 @@ After editing any files you should re-read them to make sure there's no error in
 			ctx,
 			ctxName: ctxName.length ? ctxName : null,
 			workspaceUsed: getWorkspaceFolders().join(' | '),
-			activeFile: editorManager.activeFile?.uri
+			activeFile: editorManager.activeFile?.uri,
 		})
 		await render()
 
@@ -676,7 +672,7 @@ After editing any files you should re-read them to make sure there's no error in
 			}
 			closeContextMenu()
 		},
-		true
+		true,
 	)
 
 	const draftMessage = window.localStorage?.getItem('draft-message')
@@ -703,4 +699,4 @@ After editing any files you should re-read them to make sure there's no error in
 	return scrollBottom
 }
 
-export { renderPanel }
+export {renderPanel}

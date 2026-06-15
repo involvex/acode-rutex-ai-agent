@@ -1,21 +1,21 @@
 import {
 	deleteChatHistory,
 	getHistoryList,
-	retrieveChatHistory
+	retrieveChatHistory,
 } from '../chats/history/chatHistory'
-import type { ChatMessage } from './types'
-import { getElement } from './utils'
+import type {ChatMessage} from './types'
+import {getElement} from './utils'
 
 export const historyContainer = (
 	container: HTMLElement,
 	doc: Document,
-	onHistorySelected: (messages: ChatMessage[]) => void
+	onHistorySelected: (messages: ChatMessage[]) => void,
 ) => {
 	const historyBtn = getElement<HTMLButtonElement>(container, '#history-btn')
 	const historyDialog = getElement<HTMLElement>(container, '#history-dialog')
 	const historyCloseBtn = getElement<HTMLButtonElement>(
 		container,
-		'#history-close-btn'
+		'#history-close-btn',
 	)
 	const historyListEl = getElement<HTMLElement>(container, '#history-list')
 
@@ -55,10 +55,10 @@ export const historyContainer = (
          `
 
 			const openBtn = item.querySelector<HTMLButtonElement>(
-				'.history-item-btn.open'
+				'.history-item-btn.open',
 			)
 			const deleteBtn = item.querySelector<HTMLButtonElement>(
-				'.history-item-btn.delete'
+				'.history-item-btn.delete',
 			)
 
 			openBtn?.addEventListener('click', async () => {
@@ -70,7 +70,7 @@ export const historyContainer = (
 			deleteBtn?.addEventListener('click', async () => {
 				const res = await acode.confirm(
 					'Are you sure?',
-					'This will delete this message history forever!'
+					'This will delete this message history forever!',
 				)
 
 				if (res) {

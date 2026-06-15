@@ -1,23 +1,23 @@
-import { openEditedFilesDialog } from '../../../panel/renderEditedFilesDialog'
-import {
-	getCurrentChatID,
-	saveEditedFileHistory
-} from '../../history/chatHistory'
-import { CurrentEditedFiles } from '../../types'
 import {
 	DisplayToolsCallUsed,
 	EditFileInfo,
 	EditFileLines,
 	OldEditedFileLines,
-	ToolsReturnType
+	ToolsReturnType,
 } from './types'
-import { getRelativePath } from './utils'
+import {
+	getCurrentChatID,
+	saveEditedFileHistory,
+} from '../../history/chatHistory'
+import {openEditedFilesDialog} from '../../../panel/renderEditedFilesDialog'
+import {CurrentEditedFiles} from '../../types'
+import {getRelativePath} from './utils'
 
 export const currentEdittedFiles: CurrentEditedFiles = {}
 
 export default async function* ({
 	uri,
-	lines
+	lines,
 }: EditFileInfo): AsyncGenerator<ToolsReturnType> {
 	const fs = acode.require('fs')
 	const fsPath = fs(uri)
@@ -34,7 +34,7 @@ export default async function* ({
 
 	if (!openFile) {
 		const filename = uri.substring(uri.lastIndexOf('/') + 1)
-		openFile = acode.newEditorFile(filename, { uri, render: true })
+		openFile = acode.newEditorFile(filename, {uri, render: true})
 	} else openFile.makeActive()
 
 	try {
@@ -56,11 +56,11 @@ export default async function* ({
 			type: 'edited',
 			totalAdded: 0,
 			totalRemoved: 0,
-			editedHistoryIds: []
+			editedHistoryIds: [],
 		}
 
 		for (let index = 0; index < lines.length; index++) {
-			const { line, text } = lines[index]
+			const {line, text} = lines[index]
 
 			// --- Requested line is always starting from 1 but array index starts from 0 ---
 			const targetLine = line - 1
@@ -71,7 +71,7 @@ export default async function* ({
 					line,
 					text: contentLines[targetLine],
 					isAdded: false,
-					revertable: true
+					revertable: true,
 				}
 				newLines.push(buildOldContentLines)
 
@@ -98,7 +98,7 @@ export default async function* ({
 						line: line + i,
 						text: additions[i],
 						isAdded: true,
-						revertable: i == 0 ? false : true
+						revertable: i == 0 ? false : true,
 					}
 					newLines.push(buildNewContentLines)
 
@@ -112,7 +112,7 @@ export default async function* ({
 				newLines.push({
 					line,
 					text,
-					isAdded: true
+					isAdded: true,
 				})
 
 				totalAdded++
@@ -137,10 +137,10 @@ export default async function* ({
 				// Replace everything from start to the actual end
 				session?.replace(
 					{
-						start: { row: 0, column: 0 },
-						end: { row: lastRow, column: lastColumn }
+						start: {row: 0, column: 0},
+						end: {row: lastRow, column: lastColumn},
 					},
-					newContent
+					newContent,
 				)
 		}
 
@@ -156,14 +156,14 @@ export default async function* ({
 			path: relativePath,
 			editedFileHistoryId: id,
 			totalAdded,
-			totalRemoved
+			totalRemoved,
 		} as DisplayToolsCallUsed)
 
 		const toSave = `<system_injected_preview>${toolCalling}</system_injected_preview>`
 
 		yield {
 			result: `[EDITED] +${totalAdded} -${totalRemoved}`,
-			toSave
+			toSave,
 		}
 	} finally {
 		if (openFile) {

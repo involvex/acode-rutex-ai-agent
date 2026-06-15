@@ -1,7 +1,7 @@
-import { aiSettings } from '../settings'
-import { ToolsFunction } from '../tools/functions/types'
-import { tools } from '../tools/ollama_tools'
-import { StreamChunk, ChatMessage } from '../types'
+import {ToolsFunction} from '../tools/functions/types'
+import {StreamChunk, ChatMessage} from '../types'
+import {tools} from '../tools/ollama_tools'
+import {aiSettings} from '../settings'
 
 // ─────────────────────────────────────────────
 // Ollama
@@ -10,7 +10,7 @@ import { StreamChunk, ChatMessage } from '../types'
 export default async function* (
 	model: string,
 	messages: ChatMessage[],
-	signal?: AbortSignal
+	signal?: AbortSignal,
 ): AsyncGenerator<StreamChunk> {
 	const host =
 		aiSettings.ollamaHost?.replace(/\/$/, '') || 'http://127.0.0.1:11434'
@@ -30,19 +30,19 @@ export default async function* (
 			model,
 			stream: true,
 			messages: [
-				{ role: 'system', content: aiSettings.systemInstruction },
+				{role: 'system', content: aiSettings.systemInstruction},
 				...chat_messages.map(m => ({
 					role: m.role,
 					content: m.content,
 					tool_calls: m.tool_calls,
-					tool_name: m.tool_name
-				}))
+					tool_name: m.tool_name,
+				})),
 			],
 			options: {
 				temperature: aiSettings.temperature,
-				num_predict: aiSettings.maxTokens
+				num_predict: aiSettings.maxTokens,
 			},
-			tools
+			tools,
 		})
 
 		let response: Response
@@ -51,7 +51,7 @@ export default async function* (
 				method: 'POST',
 				headers,
 				body,
-				signal
+				signal,
 			})
 		} catch (err: any) {
 			if (err.name === 'AbortError') break
@@ -59,7 +59,7 @@ export default async function* (
 			throw new Error(
 				`Failed to connect to Ollama at ${host}. ${
 					err?.message ?? 'Network error — check CORS or host.'
-				}`
+				}`,
 			)
 		}
 
@@ -77,11 +77,11 @@ export default async function* (
 
 		try {
 			while (signal?.aborted === false) {
-				const { done, value } = await reader.read()
+				const {done, value} = await reader.read()
 				if (done) break
 
 				const lines = decoder
-					.decode(value, { stream: true })
+					.decode(value, {stream: true})
 					.split('\n')
 					.filter(Boolean)
 
@@ -94,7 +94,7 @@ export default async function* (
 							yield {
 								type: 'text',
 								delta: chunk.message.content,
-								model: chunk.model ?? model
+								model: chunk.model ?? model,
 							}
 						}
 
@@ -126,7 +126,7 @@ export default async function* (
 		chat_messages.push({
 			role: 'assistant',
 			content: fullText,
-			tool_calls: toolCalls
+			tool_calls: toolCalls,
 		})
 
 		for (const call of toolCalls) {
@@ -144,7 +144,7 @@ export default async function* (
 						yield {
 							type: 'tool',
 							delta: toolChunk.toSave,
-							model: chunk?.model ?? model
+							model: chunk?.model ?? model,
 						}
 					}
 
@@ -152,7 +152,7 @@ export default async function* (
 						chat_messages.push({
 							role: 'tool',
 							tool_name: call.function.name,
-							content: toolChunk.result || '[NO RESULT]'
+							content: toolChunk.result || '[NO RESULT]',
 						})
 
 						break
@@ -165,7 +165,7 @@ export default async function* (
 				chat_messages.push({
 					role: 'tool',
 					tool_name: call.function.name,
-					content: '[ERROR] ' + errorMessage
+					content: '[ERROR] ' + errorMessage,
 				})
 			}
 		}
@@ -179,7 +179,7 @@ export default async function* (
 		usage: {
 			inputTokens: chunk?.prompt_eval_count ?? 0,
 			outputTokens: chunk?.eval_count ?? 0,
-			totalTokens: (chunk?.prompt_eval_count ?? 0) + (chunk?.eval_count ?? 0)
-		}
+			totalTokens: (chunk?.prompt_eval_count ?? 0) + (chunk?.eval_count ?? 0),
+		},
 	}
 }

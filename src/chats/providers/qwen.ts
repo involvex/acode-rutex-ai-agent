@@ -1,5 +1,5 @@
-import { aiSettings } from '../settings'
-import { StreamChunk, ChatMessage } from '../types'
+import {StreamChunk, ChatMessage} from '../types'
+import {aiSettings} from '../settings'
 
 // ─────────────────────────────────────────────
 // Qwen (OpenAI-compatible via fetch)
@@ -8,10 +8,10 @@ import { StreamChunk, ChatMessage } from '../types'
 export default async function* (
 	model: string,
 	messages: ChatMessage[],
-	signal?: AbortSignal
+	signal?: AbortSignal,
 ): AsyncGenerator<StreamChunk> {
 	const formattedHistory = messages
-		.map((message) => {
+		.map(message => {
 			const role = message.role === 'assistant' ? 'ASSISTANT' : 'USER'
 			return `${role}:\n${message.content}`
 		})
@@ -22,23 +22,23 @@ export default async function* (
 		aiSettings.systemInstruction,
 		'',
 		'─────── CONVERSATIONS ─────────────────────────────────────────────',
-		formattedHistory
+		formattedHistory,
 	].join('\n')
 
 	const response = await fetch('https://qwen.aikit.club/v1/chat/completions', {
 		method: 'POST',
 		headers: {
 			Authorization: `Bearer ${aiSettings.apiKeys.qwen}`,
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
 		},
 		body: JSON.stringify({
 			model,
 			temperature: aiSettings.temperature,
 			max_tokens: aiSettings.maxTokens,
 			stream: true,
-			messages: [{ role: 'user', content: combinedPrompt }]
+			messages: [{role: 'user', content: combinedPrompt}],
 		}),
-		signal
+		signal,
 	})
 
 	if (!response.ok) {
@@ -51,19 +51,19 @@ export default async function* (
 	let buffer = ''
 	let fullText = ''
 	let resolvedModel = model
-	
+
 	const usage = {
 		inputTokens: 0,
 		outputTokens: 0,
-		totalTokens: 0
+		totalTokens: 0,
 	}
 
 	while (true) {
-		const { done, value } = await reader.read()
+		const {done, value} = await reader.read()
 		if (done) break
 		if (signal?.aborted) break
 
-		buffer += decoder.decode(value, { stream: true })
+		buffer += decoder.decode(value, {stream: true})
 		const lines = buffer.split('\n')
 		buffer = lines.pop() ?? ''
 
@@ -84,10 +84,10 @@ export default async function* (
 
 				resolvedModel = chunk.model ?? resolvedModel
 				const delta = chunk.choices?.[0]?.delta?.content ?? ''
-	
+
 				if (delta) {
 					fullText += delta
-					yield { type: 'text', model: resolvedModel, delta }
+					yield {type: 'text', model: resolvedModel, delta}
 				}
 			} catch {
 				// malformed chunk, skip
@@ -100,6 +100,6 @@ export default async function* (
 		text: fullText,
 		provider: 'qwen',
 		model: resolvedModel,
-		usage
+		usage,
 	}
 }

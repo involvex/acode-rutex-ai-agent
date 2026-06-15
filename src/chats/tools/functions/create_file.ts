@@ -1,14 +1,14 @@
-import { openEditedFilesDialog } from '../../../panel/renderEditedFilesDialog'
-import { currentEdittedFiles } from './edit_file'
-import { CreateFileInfo } from './types'
-import { getRelativePath } from './utils'
+import {openEditedFilesDialog} from '../../../panel/renderEditedFilesDialog'
+import {currentEdittedFiles} from './edit_file'
+import {getRelativePath} from './utils'
+import {CreateFileInfo} from './types'
 
-export default async function* ({ uri, content = '' }: CreateFileInfo) {
+export default async function* ({uri, content = ''}: CreateFileInfo) {
 	// --- SEND SIGNAL TO PANEL THAT FILE IS BEING READ ---
 	const relativePath = getRelativePath(uri)
 
 	const toolCalling = JSON.stringify({
-		header: `FILE CREATED: ${relativePath}`
+		header: `FILE CREATED: ${relativePath}`,
 	})
 	const toSave = `<system_injected_preview>${toolCalling}</system_injected_preview>`
 
@@ -30,16 +30,16 @@ export default async function* ({ uri, content = '' }: CreateFileInfo) {
 
 	const result = await fs(dirPath).createFile(filename, content)
 
-	acode.newEditorFile(filename, { render: true, uri })
+	acode.newEditorFile(filename, {render: true, uri})
 
 	currentEdittedFiles[uri] = {
 		type: 'created',
 		totalAdded: content.split('\n').length,
 		totalRemoved: 0,
-		editedHistoryIds: []
+		editedHistoryIds: [],
 	}
 
 	openEditedFilesDialog()
 
-	yield { result, toSave }
+	yield {result, toSave}
 }

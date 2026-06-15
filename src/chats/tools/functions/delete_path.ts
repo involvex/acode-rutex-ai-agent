@@ -1,7 +1,7 @@
-import { CreateFileInfo } from './types'
-import { getRelativePath } from './utils'
+import {getRelativePath} from './utils'
+import {CreateFileInfo} from './types'
 
-export default async function* ({ uri, content = '' }: CreateFileInfo) {
+export default async function* ({uri, content = ''}: CreateFileInfo) {
 	// --- START FILE READ ---
 	const fs = acode.require('fs')
 
@@ -21,11 +21,11 @@ export default async function* ({ uri, content = '' }: CreateFileInfo) {
 	} DELETED: ${relativePath}`
 
 	const toolCalling = JSON.stringify({
-		header: result
+		header: result,
 	})
 	const toSave = `<system_injected_preview>${toolCalling}</system_injected_preview>`
 
 	await fs(uri).delete()
 
-	yield { result, toSave }
+	yield {result, toSave}
 }

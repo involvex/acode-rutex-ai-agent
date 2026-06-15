@@ -4,7 +4,8 @@
 		<meta charset="UTF-8" />
 		<meta
 			name="viewport"
-			content="width=device-width, initial-scale=1.0, user-scalable=no" />
+			content="width=device-width, initial-scale=1.0, user-scalable=no"
+		/>
 		<title>My Website</title>
 		<style>
 			body {
@@ -27,9 +28,15 @@
 			<h1>Welcome to My Website</h1>
 		</header>
 		<main>
-			<form action="/submit" method="POST">
+			<form
+				action="/submit"
+				method="POST"
+			>
 				<label for="options">Select an option:</label>
-				<select name="options" id="options">
+				<select
+					name="options"
+					id="options"
+				>
 					<option value="">Choose an option</option>
 					<option value="1">Option 1</option>
 					<option value="2">Option 2</option>
@@ -37,11 +44,21 @@
 				</select>
 				<div>
 					<label for="email">Email:</label>
-					<input type="email" id="email" name="email" required />
+					<input
+						type="email"
+						id="email"
+						name="email"
+						required
+					/>
 				</div>
 				<div>
 					<label for="password">Password:</label>
-					<input type="password" id="password" name="password" required />
+					<input
+						type="password"
+						id="password"
+						name="password"
+						required
+					/>
 				</div>
 				<button type="submit">Submit</button>
 				<button type="button">Another Button</button>

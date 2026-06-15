@@ -1,4 +1,4 @@
-import { ProviderModelMeta } from './types'
+import {ProviderModelMeta} from './types'
 
 export default [
 	{
@@ -7,7 +7,7 @@ export default [
 		contextWindow: '400K tokens',
 		maxOutputTokens: '128K tokens',
 		bestFor: ['Code generation', 'Repository edits', 'Agentic coding'],
-		notes: 'Codex-tuned GPT-5 family model for software engineering workflows.'
+		notes: 'Codex-tuned GPT-5 family model for software engineering workflows.',
 	},
 	{
 		id: 'gpt-5.2-codex',
@@ -15,7 +15,7 @@ export default [
 		contextWindow: '400K tokens',
 		maxOutputTokens: '128K tokens',
 		bestFor: ['Code refactors', 'Bug fixing', 'Tool-driven coding tasks'],
-		notes: 'Reliable Codex model for iterative coding assistance.'
+		notes: 'Reliable Codex model for iterative coding assistance.',
 	},
 	{
 		id: 'gpt-5.4',
@@ -23,7 +23,8 @@ export default [
 		contextWindow: '1.05M tokens',
 		maxOutputTokens: '128K tokens',
 		bestFor: ['Agentic tasks', 'Computer use', 'Complex reasoning'],
-		notes: 'Latest frontier model with native computer-use capabilities and unified Codex logic.'
+		notes:
+			'Latest frontier model with native computer-use capabilities and unified Codex logic.',
 	},
 	{
 		id: 'gpt-5.4-pro',
@@ -33,9 +34,10 @@ export default [
 		bestFor: [
 			'Frontier reasoning',
 			'Complex architecture',
-			'Hard coding tasks'
+			'Hard coding tasks',
 		],
-		notes: 'Premium variant with 5-level reasoning effort control and superior SWE-bench scores.'
+		notes:
+			'Premium variant with 5-level reasoning effort control and superior SWE-bench scores.',
 	},
 	{
 		id: 'gpt-5-mini',
@@ -43,7 +45,7 @@ export default [
 		contextWindow: '128K tokens',
 		maxOutputTokens: '16K tokens',
 		bestFor: ['Fast chats', 'Affordable reasoning', 'Summarization'],
-		notes: 'Replaced GPT-4.1 mini as the standard high-efficiency model.'
+		notes: 'Replaced GPT-4.1 mini as the standard high-efficiency model.',
 	},
 	{
 		id: 'gpt-4o',
@@ -51,7 +53,7 @@ export default [
 		contextWindow: '128K tokens',
 		maxOutputTokens: '16K tokens',
 		bestFor: ['General chat', 'Code generation', 'Multimodal workflows'],
-		notes: 'Balanced speed and quality.'
+		notes: 'Balanced speed and quality.',
 	},
 	{
 		id: 'gpt-4.1',
@@ -59,7 +61,7 @@ export default [
 		contextWindow: '1M tokens',
 		maxOutputTokens: '32K tokens',
 		bestFor: ['Long-context coding', 'Complex reasoning', 'Tool use'],
-		notes: 'Great for large codebase understanding.'
+		notes: 'Great for large codebase understanding.',
 	},
 	{
 		id: 'gpt-4.1-mini',
@@ -67,7 +69,7 @@ export default [
 		contextWindow: '1M tokens',
 		maxOutputTokens: '32K tokens',
 		bestFor: ['Fast coding', 'Lower-cost automation', 'Long context'],
-		notes: 'Faster and cheaper GPT-4.1 variant.'
+		notes: 'Faster and cheaper GPT-4.1 variant.',
 	},
 	{
 		id: 'o3',
@@ -75,7 +77,7 @@ export default [
 		contextWindow: '200K tokens',
 		maxOutputTokens: '100K tokens',
 		bestFor: ['Deep reasoning', 'Planning', 'Difficult bug analysis'],
-		notes: 'Strong deliberative reasoning model.'
+		notes: 'Strong deliberative reasoning model.',
 	},
 	{
 		id: 'o4-mini',
@@ -83,6 +85,6 @@ export default [
 		contextWindow: '200K tokens',
 		maxOutputTokens: '100K tokens',
 		bestFor: ['Fast reasoning', 'Lower-cost automation', 'Structured tasks'],
-		notes: 'Reasoning optimized with lower latency.'
-	}
+		notes: 'Reasoning optimized with lower latency.',
+	},
 ] as const satisfies ProviderModelMeta[]

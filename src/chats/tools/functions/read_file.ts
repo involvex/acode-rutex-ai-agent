@@ -1,10 +1,10 @@
-import { ReadFileInfo, ToolsReturnType } from './types'
-import { getRelativePath } from './utils'
+import {ReadFileInfo, ToolsReturnType} from './types'
+import {getRelativePath} from './utils'
 
 export default async function* ({
 	uri,
 	start_line,
-	end_line
+	end_line,
 }: ReadFileInfo): AsyncGenerator<ToolsReturnType> {
 	const startLine = Math.max(1, start_line)
 	const endLine = Math.max(2, end_line)
@@ -13,7 +13,7 @@ export default async function* ({
 	const relativePath = getRelativePath(uri)
 
 	const toolCalling = JSON.stringify({
-		header: `READ: ${relativePath}:${startLine}-${endLine}`
+		header: `READ: ${relativePath}:${startLine}-${endLine}`,
 	})
 	const toSave = `<system_injected_preview>${toolCalling}</system_injected_preview>`
 
@@ -35,5 +35,5 @@ export default async function* ({
 		.map((line, index) => `${startLine + index}: ${line}`)
 		.join('\n')
 
-	yield { result, toSave }
+	yield {result, toSave}
 }

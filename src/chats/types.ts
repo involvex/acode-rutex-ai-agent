@@ -31,7 +31,7 @@ export interface Usage {
  * - { type: "done" }  — stream finished, contains full text + usage stats
  */
 export type StreamChunk =
-	| { type: 'text' | 'tool'; delta: string; model?: string }
+	| {type: 'text' | 'tool'; delta: string; model?: string}
 	| {
 			type: 'done'
 			text: string
@@ -43,12 +43,15 @@ export type StreamChunk =
 export type StreamFunction = (
 	model: string,
 	messages: ChatMessage[],
-	signal?: AbortSignal
+	signal?: AbortSignal,
 ) => AsyncGenerator<StreamChunk>
 
-export type CurrentEditedFiles = Record<string, {
-	type: 'edited' | 'created'
-	totalAdded: number,
-	totalRemoved: number,
-	editedHistoryIds: string[]
-}>
+export type CurrentEditedFiles = Record<
+	string,
+	{
+		type: 'edited' | 'created'
+		totalAdded: number
+		totalRemoved: number
+		editedHistoryIds: string[]
+	}
+>

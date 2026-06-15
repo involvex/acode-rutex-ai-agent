@@ -1,16 +1,16 @@
-import hljs from 'highlight.js/lib/core'
-import bash from 'highlight.js/lib/languages/bash'
-import css from 'highlight.js/lib/languages/css'
-import javascript from 'highlight.js/lib/languages/javascript'
-import json from 'highlight.js/lib/languages/json'
-import markdown from 'highlight.js/lib/languages/markdown'
-import php from 'highlight.js/lib/languages/php'
-import python from 'highlight.js/lib/languages/python'
+import {OldEditedFileLines} from '../chats/tools/functions/types'
 import typescript from 'highlight.js/lib/languages/typescript'
+import javascript from 'highlight.js/lib/languages/javascript'
+import markdown from 'highlight.js/lib/languages/markdown'
+import {processSingleToolCallTag} from './commandParser'
+import python from 'highlight.js/lib/languages/python'
+import json from 'highlight.js/lib/languages/json'
+import bash from 'highlight.js/lib/languages/bash'
 import xml from 'highlight.js/lib/languages/xml'
-import { escapeHtml } from './utils'
-import { processSingleToolCallTag } from './commandParser'
-import { OldEditedFileLines } from '../chats/tools/functions/types'
+import php from 'highlight.js/lib/languages/php'
+import css from 'highlight.js/lib/languages/css'
+import hljs from 'highlight.js/lib/core'
+import {escapeHtml} from './utils'
 
 const TOOL_TAG_REGEX =
 	/<system_injected_preview>[\s\S]*?<\/system_injected_preview>/gi
@@ -38,7 +38,7 @@ const escapeHtml2 = (value: string): string => {
 		'<': '&lt;',
 		'>': '&gt;',
 		'"': '&quot;',
-		"'": '&#39;'
+		"'": '&#39;',
 	}
 	return String(value || '').replace(/[&<>"']/g, char => map[char])
 }
@@ -90,7 +90,7 @@ const renderMarkdownBlock = (block: string): string => {
 			flushList()
 			const level = headingMatch[1].length
 			output.push(
-				`<h${level}>${renderInlineMarkdown(headingMatch[2])}</h${level}>`
+				`<h${level}>${renderInlineMarkdown(headingMatch[2])}</h${level}>`,
 			)
 			continue
 		}
@@ -99,9 +99,7 @@ const renderMarkdownBlock = (block: string): string => {
 		if (blockquoteMatch) {
 			flushList()
 			output.push(
-				`<blockquote>${renderInlineMarkdown(
-					blockquoteMatch[1]
-				)}</blockquote>`
+				`<blockquote>${renderInlineMarkdown(blockquoteMatch[1])}</blockquote>`,
 			)
 			continue
 		}
@@ -131,7 +129,7 @@ const renderMarkdownBlock = (block: string): string => {
 }
 
 const renderMarkdownBlockWithToolCalls = async (
-	block: string
+	block: string,
 ): Promise<string> => {
 	const matches = [...block.matchAll(TOOL_TAG_REGEX)]
 	if (!matches.length) return renderMarkdownBlock(block)
@@ -171,13 +169,15 @@ export const renderMarkdown = async (raw: string): Promise<string> => {
 		}
 
 		const language = normalizeLanguage(match[1] || 'code')
-		const code = String(match[2] || '').replace(/\n$/, '').trimEnd()
+		const code = String(match[2] || '')
+			.replace(/\n$/, '')
+			.trimEnd()
 		const encoded = btoa(unescape(encodeURIComponent(code)))
 
 		let highlighted = code
 		try {
 			highlighted = hljs.getLanguage(language)
-				? hljs.highlight(code, { language }).value
+				? hljs.highlight(code, {language}).value
 				: hljs.highlightAuto(code).value
 		} catch {
 			highlighted = escapeHtml2(code)
@@ -209,7 +209,7 @@ export const renderEditedFileLines = (
 	lines: OldEditedFileLines[],
 	editedFilePath: string,
 	totalAdded: number,
-	totalRemoved: number
+	totalRemoved: number,
 ): string => {
 	// Rendering strategy:
 	// 1) group all edits by line number
@@ -248,7 +248,7 @@ export const renderEditedFileLines = (
 		blocks.push({
 			startLine: blockLines[0],
 			endLine: blockLines[blockLines.length - 1],
-			lines: blockLines
+			lines: blockLines,
 		})
 
 		i++
@@ -263,7 +263,7 @@ export const renderEditedFileLines = (
 		let highlighted = ''
 		try {
 			highlighted = getLanguage
-				? hljs.highlight(code, { language }).value
+				? hljs.highlight(code, {language}).value
 				: hljs.highlightAuto(code).value
 		} catch {
 			highlighted = escapeHtml2(code)
@@ -278,7 +278,7 @@ export const renderEditedFileLines = (
 			`<span class="edited-line-number">${entry.line}</span>`,
 			`<span class="edited-line-prefix">${entry.isAdded ? '+' : '-'}</span>`,
 			`<span class="edited-line-text">${highlight(entry.text)}</span>`,
-			'</div>'
+			'</div>',
 		].join('')
 
 	const rows: string[] = []
@@ -300,8 +300,8 @@ export const renderEditedFileLines = (
 
 				rows.push(
 					`<div class="edited-line-separator"><span>${escapeHtml2(
-						gapLabel
-					)}</span></div>`
+						gapLabel,
+					)}</span></div>`,
 				)
 			}
 		}
@@ -328,9 +328,9 @@ export const renderEditedFileLines = (
 	return [
 		'<div class="code-block edited-lines-block">',
 		`<div class="code-header edited-h"><span class="code-lang edited">EDITED: ${escapeHtml(
-			editedFilePath
+			editedFilePath,
 		)} +${totalAdded} -${totalRemoved}</span></div>`,
 		`<div class="code-body edited-lines-body">${rows.join('')}</div>`,
-		'</div>'
+		'</div>',
 	].join('')
 }

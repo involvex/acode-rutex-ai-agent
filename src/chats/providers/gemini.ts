@@ -1,8 +1,8 @@
-import { GoogleGenAI } from '@google/genai'
-import { aiSettings } from '../settings'
-import { ToolsFunction } from '../tools/functions/types'
-import { tools as ollamaTools } from '../tools/ollama_tools'
-import { Usage, StreamChunk, ChatMessage } from '../types'
+import {tools as ollamaTools} from '../tools/ollama_tools'
+import {Usage, StreamChunk, ChatMessage} from '../types'
+import {ToolsFunction} from '../tools/functions/types'
+import {GoogleGenAI} from '@google/genai'
+import {aiSettings} from '../settings'
 
 // ─────────────────────────────────────────────
 // Gemini
@@ -11,15 +11,15 @@ import { Usage, StreamChunk, ChatMessage } from '../types'
 export default async function* (
 	model: string,
 	messages: ChatMessage[],
-	signal?: AbortSignal
+	signal?: AbortSignal,
 ): AsyncGenerator<StreamChunk> {
-	const ai = new GoogleGenAI({ apiKey: aiSettings.apiKeys.gemini })
+	const ai = new GoogleGenAI({apiKey: aiSettings.apiKeys.gemini})
 
 	// Mirror Ollama flow: incoming messages are plain history; tool state is built
 	// only inside this provider execution loop.
 	const turnMessages: ChatMessage[] = messages.map(m => ({
 		role: m.role,
-		content: m.content
+		content: m.content,
 	}))
 
 	const contents: any[] = turnMessages
@@ -28,28 +28,28 @@ export default async function* (
 			if (m.role === 'assistant') {
 				// Keep historical assistant turns as text-only. Function call parts from
 				// prior turns can carry thought signatures that are not available here.
-				return { role: 'model', parts: [{ text: m.content || '' }] }
+				return {role: 'model', parts: [{text: m.content || ''}]}
 			}
 
-			return { role: 'user', parts: [{ text: m.content }] }
+			return {role: 'user', parts: [{text: m.content}]}
 		})
 
 	const functionDeclarations = ollamaTools.map(tool => ({
 		name: tool.function.name,
 		description: tool.function.description,
-		parameters: tool.function.parameters
+		parameters: tool.function.parameters,
 	}))
 
 	const config: any = {
 		systemInstruction: aiSettings.systemInstruction,
 		temperature: aiSettings.temperature,
 		maxOutputTokens: aiSettings.maxTokens,
-		tools: [{ functionDeclarations }]
+		tools: [{functionDeclarations}],
 	}
 
 	let fullText = ''
 	let chunk: any = null
-	let usage: Usage = { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
+	let usage: Usage = {inputTokens: 0, outputTokens: 0, totalTokens: 0}
 
 	while (true) {
 		if (signal?.aborted) break
@@ -57,7 +57,7 @@ export default async function* (
 		const stream = await ai.models.generateContentStream({
 			model,
 			contents,
-			config
+			config,
 		})
 
 		const toolCalls: any[] = []
@@ -77,8 +77,7 @@ export default async function* (
 			if (functionCalls?.length) {
 				for (const call of functionCalls) {
 					const id =
-						call?.id ??
-						`${call?.name}:${JSON.stringify(call?.args ?? {})}`
+						call?.id ?? `${call?.name}:${JSON.stringify(call?.args ?? {})}`
 					if (seenToolCallIds.has(id)) continue
 					seenToolCallIds.add(id)
 					toolCalls.push(call)
@@ -89,7 +88,7 @@ export default async function* (
 			if (delta) {
 				turnText += delta
 				fullText += delta
-				yield { type: 'text', delta, model: chunk.modelVersion || model }
+				yield {type: 'text', delta, model: chunk.modelVersion || model}
 			}
 
 			const meta = (
@@ -106,7 +105,7 @@ export default async function* (
 				usage = {
 					inputTokens: meta.promptTokenCount ?? 0,
 					outputTokens: meta.candidatesTokenCount ?? 0,
-					totalTokens: meta.totalTokenCount ?? 0
+					totalTokens: meta.totalTokenCount ?? 0,
 				}
 			}
 		}
@@ -116,7 +115,7 @@ export default async function* (
 		turnMessages.push({
 			role: 'assistant',
 			content: turnText,
-			tool_calls: toolCalls
+			tool_calls: toolCalls,
 		})
 
 		// Reuse the model-emitted content so functionCall thought signatures are preserved.
@@ -124,20 +123,20 @@ export default async function* (
 			contents.push(lastModelContent)
 		} else {
 			const fallbackParts: any[] = []
-			if (turnText) fallbackParts.push({ text: turnText })
+			if (turnText) fallbackParts.push({text: turnText})
 			for (const call of toolCalls) {
 				fallbackParts.push({
 					functionCall: {
 						id: call.id,
 						name: call.name,
-						args: call.args ?? {}
-					}
+						args: call.args ?? {},
+					},
 				})
 			}
 
 			contents.push({
 				role: 'model',
-				parts: fallbackParts.length ? fallbackParts : [{ text: '' }]
+				parts: fallbackParts.length ? fallbackParts : [{text: ''}],
 			})
 		}
 
@@ -161,7 +160,7 @@ export default async function* (
 						yield {
 							type: 'tool',
 							delta: toolChunk.toSave,
-							model: chunk.modelVersion || model
+							model: chunk.modelVersion || model,
 						}
 					}
 
@@ -174,13 +173,13 @@ export default async function* (
 				functionResponses.push({
 					id: call.id,
 					name: call.name,
-					response: { result: resultContent || '[NO RESULT]' }
+					response: {result: resultContent || '[NO RESULT]'},
 				})
 
 				turnMessages.push({
 					role: 'tool',
 					tool_name: call.name,
-					content: resultContent || '[NO RESULT]'
+					content: resultContent || '[NO RESULT]',
 				})
 			} catch (e: any) {
 				const errorMessage =
@@ -189,13 +188,13 @@ export default async function* (
 				functionResponses.push({
 					id: call.id,
 					name: call.name,
-					response: { result: `[ERROR] ${errorMessage}` }
+					response: {result: `[ERROR] ${errorMessage}`},
 				})
 
 				turnMessages.push({
 					role: 'tool',
 					tool_name: call.name,
-					content: `[ERROR] ${errorMessage}`
+					content: `[ERROR] ${errorMessage}`,
 				})
 			}
 		}
@@ -203,8 +202,8 @@ export default async function* (
 		contents.push({
 			role: 'user',
 			parts: functionResponses.map(functionResponse => ({
-				functionResponse
-			}))
+				functionResponse,
+			})),
 		})
 	}
 
@@ -213,6 +212,6 @@ export default async function* (
 		text: fullText,
 		provider: 'gemini',
 		model: chunk.modelVersion || model,
-		usage
+		usage,
 	}
 }

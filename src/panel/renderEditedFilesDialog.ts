@@ -1,8 +1,8 @@
-import { retrieveEditedFileHistory } from '../chats/history/chatHistory'
-import { currentEdittedFiles } from '../chats/tools/functions/edit_file'
-import { OldEditedFileLines } from '../chats/tools/functions/types'
-import { getRelativePath } from '../chats/tools/functions/utils'
-import { doc, escapeHtml } from './utils'
+import {currentEdittedFiles} from '../chats/tools/functions/edit_file'
+import {retrieveEditedFileHistory} from '../chats/history/chatHistory'
+import {OldEditedFileLines} from '../chats/tools/functions/types'
+import {getRelativePath} from '../chats/tools/functions/utils'
+import {doc, escapeHtml} from './utils'
 
 export function openEditedFilesDialog() {
 	const dialog = doc.document.getElementById('edited-files-bar')
@@ -22,7 +22,7 @@ export function openEditedFilesDialog() {
 
 		const fileInfo = currentEdittedFiles[filePath]
 		const fileOption = filesList.querySelector(
-			`.edited-file-option[data-file-path="${encodedPath}"]`
+			`.edited-file-option[data-file-path="${encodedPath}"]`,
 		)
 
 		if (fileOption) {
@@ -82,7 +82,7 @@ export function openEditedFilesDialog() {
 				currentEdittedFiles[filePath].editedHistoryIds
 
 			let historyRecords = await retrieveEditedFileHistory({
-				ids: editedFileHistoryIds
+				ids: editedFileHistoryIds,
 			})
 			historyRecords = historyRecords.reverse()
 

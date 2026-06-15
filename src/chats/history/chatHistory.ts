@@ -1,13 +1,13 @@
-import { ChatMessage } from '../../panel/types'
 import {
 	CHAT_HISTORY_KEYS,
 	CHAT_HISTORY_STORE,
 	EDITED_FILE_HISTORY_STORE,
 	LAST_ACTIVE_CHAT_HISTORY_KEY,
 	RUTEX_DB_NAME,
-	RUTEX_DB_VERSION
+	RUTEX_DB_VERSION,
 } from '../../configs/constants'
-import { OldEditedFileLines } from '../tools/functions/types'
+import {OldEditedFileLines} from '../tools/functions/types'
+import {ChatMessage} from '../../panel/types'
 
 let currentChatID: string = ''
 
@@ -40,32 +40,32 @@ const initializeRutexDB = (): Promise<IDBDatabase> => {
 			const db = request.result
 
 			if (!db.objectStoreNames.contains(CHAT_HISTORY_STORE)) {
-				db.createObjectStore(CHAT_HISTORY_STORE, { keyPath: 'id' })
+				db.createObjectStore(CHAT_HISTORY_STORE, {keyPath: 'id'})
 			}
 
 			let store: IDBObjectStore
 
 			if (!db.objectStoreNames.contains(EDITED_FILE_HISTORY_STORE)) {
 				store = db.createObjectStore(EDITED_FILE_HISTORY_STORE, {
-					keyPath: 'id'
+					keyPath: 'id',
 				})
 			} else {
 				store = request.transaction!.objectStore(EDITED_FILE_HISTORY_STORE)
 			}
 
 			if (!store.indexNames.contains('filePath')) {
-				store.createIndex('filePath', 'filePath', { unique: false })
+				store.createIndex('filePath', 'filePath', {unique: false})
 			}
 
 			if (!store.indexNames.contains('chatHistoryId')) {
 				store.createIndex('chatHistoryId', 'chatHistoryId', {
-					unique: false
+					unique: false,
 				})
 			}
 
 			if (!store.indexNames.contains('chat_file')) {
 				store.createIndex('chat_file', ['chatHistoryId', 'filePath'], {
-					unique: false
+					unique: false,
 				})
 			}
 		}
@@ -91,7 +91,7 @@ const initializeRutexDB = (): Promise<IDBDatabase> => {
 const withStore = async <T>(
 	mode: IDBTransactionMode,
 	storeName: 'chat_histories' | 'edited_histories',
-	handler: (store: IDBObjectStore) => IDBRequest<T>
+	handler: (store: IDBObjectStore) => IDBRequest<T>,
 ): Promise<T> => {
 	const db = await initializeRutexDB()
 
@@ -110,7 +110,7 @@ const withStore = async <T>(
 export const getHistoryList = (): HistoryList => {
 	try {
 		return JSON.parse(
-			localStorage.getItem(CHAT_HISTORY_KEYS) || '{}'
+			localStorage.getItem(CHAT_HISTORY_KEYS) || '{}',
 		) as HistoryList
 	} catch {
 		return {} as HistoryList
@@ -141,13 +141,13 @@ export const saveChatHistory = async (messages: ChatMessage[]) => {
 
 	try {
 		await withStore('readwrite', CHAT_HISTORY_STORE, store =>
-			store.put({ id: currentChatID, messages } as ChatHistoryRecord)
+			store.put({id: currentChatID, messages} as ChatHistoryRecord),
 		)
 	} catch {}
 }
 
 export const retrieveChatHistory = async (
-	chatID: string | null = null
+	chatID: string | null = null,
 ): Promise<ChatMessage[]> => {
 	if (chatID) {
 		currentChatID = chatID
@@ -160,7 +160,7 @@ export const retrieveChatHistory = async (
 
 	try {
 		const record = await withStore('readonly', CHAT_HISTORY_STORE, store =>
-			store.get(currentChatID)
+			store.get(currentChatID),
 		)
 		return (record as ChatHistoryRecord | undefined)?.messages || []
 	} catch {
@@ -175,9 +175,9 @@ export const deleteChatHistory = async (chatID: string | null = null) => {
 	if (chatID === currentChatID) currentChatID = ''
 
 	try {
-		await deleteEditedFileHistory({ chatHistoryId: chatID })
+		await deleteEditedFileHistory({chatHistoryId: chatID})
 		await withStore('readwrite', CHAT_HISTORY_STORE, store =>
-			store.delete(chatID)
+			store.delete(chatID),
 		)
 		editChatHistoryList(lists => delete lists[chatID])
 	} catch {}
@@ -202,7 +202,7 @@ export const deleteAllChatHistory = async () => {
 export const saveEditedFileHistory = async (
 	content: OldEditedFileLines[],
 	filePath: string,
-	chatHistoryId: string
+	chatHistoryId: string,
 ): Promise<string> => {
 	const id = crypto.randomUUID()
 
@@ -213,8 +213,8 @@ export const saveEditedFileHistory = async (
 				content,
 				filePath,
 				chatHistoryId,
-				createdAt: Date.now()
-			} as EditedFileHistoryRecord)
+				createdAt: Date.now(),
+			} as EditedFileHistoryRecord),
 		)
 	} catch {}
 
@@ -222,16 +222,16 @@ export const saveEditedFileHistory = async (
 }
 
 export const retrieveEditedFileHistory = async (
-	filter: { ids: string[] } | { filePath: string }
+	filter: {ids: string[]} | {filePath: string},
 ): Promise<EditedFileHistoryRecord[]> => {
 	try {
 		if ('ids' in filter) {
 			const results = await Promise.all(
 				filter.ids.map(id =>
 					withStore('readonly', EDITED_FILE_HISTORY_STORE, store =>
-						store.get(id)
-					)
-				)
+						store.get(id),
+					),
+				),
 			)
 
 			return results as EditedFileHistoryRecord[]
@@ -243,7 +243,7 @@ export const retrieveEditedFileHistory = async (
 			store => {
 				const index = store.index('filePath')
 				return index.getAll(filter.filePath)
-			}
+			},
 		)
 
 		return results as EditedFileHistoryRecord[]
@@ -253,8 +253,8 @@ export const retrieveEditedFileHistory = async (
 }
 
 export type DeleteEditedFileHistoryFilter =
-	| { chatHistoryId: string }
-	| { id: string }
+	| {chatHistoryId: string}
+	| {id: string}
 	| null
 
 /**
@@ -263,13 +263,13 @@ export type DeleteEditedFileHistoryFilter =
  * @returns A promise that resolves when the deletion is complete.
  */
 export const deleteEditedFileHistory = async (
-	deleteBy: DeleteEditedFileHistoryFilter = null
+	deleteBy: DeleteEditedFileHistoryFilter = null,
 ): Promise<void> => {
 	try {
 		// delete everything
 		if (!deleteBy) {
 			await withStore('readwrite', EDITED_FILE_HISTORY_STORE, store =>
-				store.clear()
+				store.clear(),
 			)
 			return
 		}
@@ -296,7 +296,7 @@ export const deleteEditedFileHistory = async (
 		// --- Delete by id ---
 		if ('id' in deleteBy) {
 			await withStore('readwrite', EDITED_FILE_HISTORY_STORE, store =>
-				store.delete(deleteBy.id)
+				store.delete(deleteBy.id),
 			)
 		}
 	} catch {}

@@ -1,14 +1,14 @@
-import { ListDirInfo, ToolsReturnType } from './types'
-import { getRelativePath } from './utils'
+import {ListDirInfo, ToolsReturnType} from './types'
+import {getRelativePath} from './utils'
 
 export default async function* ({
-	uri
+	uri,
 }: ListDirInfo): AsyncGenerator<ToolsReturnType> {
 	// --- SEND SIGNAL TO PANEL THAT DIRECTORY IS LISTING ---
 	const relativePath = getRelativePath(uri)
 
 	const toolCalling = JSON.stringify({
-		header: `VIEWED: ${relativePath}`
+		header: `VIEWED: ${relativePath}`,
 	})
 
 	const toSave = `<system_injected_preview>${toolCalling}</system_injected_preview>`
@@ -32,5 +32,5 @@ export default async function* ({
 			})
 			.join(' | ') || '[EMPTY DIRECTORY]'
 
-	yield { result, toSave }
+	yield {result, toSave}
 }

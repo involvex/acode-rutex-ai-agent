@@ -1,9 +1,9 @@
-import { OpenRouter } from '@openrouter/sdk'
-import { aiSettings } from '../settings'
-import { ToolsFunction } from '../tools/functions/types'
-import { tools as ollamaTools } from '../tools/ollama_tools'
-import { Usage, StreamChunk, ChatMessage } from '../types'
-import { OutputFunctionCallItem } from '@openrouter/sdk/esm/models'
+import {OutputFunctionCallItem} from '@openrouter/sdk/esm/models'
+import {tools as ollamaTools} from '../tools/ollama_tools'
+import {Usage, StreamChunk, ChatMessage} from '../types'
+import {ToolsFunction} from '../tools/functions/types'
+import {OpenRouter} from '@openrouter/sdk'
+import {aiSettings} from '../settings'
 
 // ─────────────────────────────────────────────
 // OpenRouter  (official @openrouter/sdk)
@@ -12,31 +12,31 @@ import { OutputFunctionCallItem } from '@openrouter/sdk/esm/models'
 export default async function* (
 	model: string,
 	messages: ChatMessage[],
-	signal?: AbortSignal
+	signal?: AbortSignal,
 ): AsyncGenerator<StreamChunk> {
 	const client = new OpenRouter({
 		apiKey: aiSettings.apiKeys.openrouter,
 		httpReferer: aiSettings.openRouterSiteUrl || undefined,
-		appTitle: aiSettings.openRouterSiteName || undefined
+		appTitle: aiSettings.openRouterSiteName || undefined,
 	})
 
 	// Mirror the provider pattern used elsewhere: plain incoming history,
 	// then provider-local tool loop with function_call_output continuations.
 	const chat_messages: any[] = messages.map(m => ({
 		role: m.role,
-		content: m.content
+		content: m.content,
 	}))
 
 	const responseTools = ollamaTools.map(tool => ({
 		type: 'function' as const,
 		name: tool.function.name,
 		description: tool.function.description,
-		parameters: tool.function.parameters
+		parameters: tool.function.parameters,
 	}))
 
 	let fullText = ''
 	let resolvedModel = model
-	let usage: Usage = { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
+	const usage: Usage = {inputTokens: 0, outputTokens: 0, totalTokens: 0}
 
 	while (true) {
 		if (signal?.aborted) break
@@ -55,10 +55,10 @@ export default async function* (
 					toolChoice: 'auto',
 					input: chat_messages,
 					instructions: aiSettings.systemInstruction,
-					stream: true
-				}
+					stream: true,
+				},
 			},
-			{ signal }
+			{signal},
 		)
 
 		for await (const chunk of response) {
@@ -67,7 +67,7 @@ export default async function* (
 			switch (chunk.type) {
 				case 'response.output_text.delta':
 					fullText += chunk.delta
-					yield { type: 'text', delta: chunk.delta, model: resolvedModel }
+					yield {type: 'text', delta: chunk.delta, model: resolvedModel}
 					break
 
 				// A new output item started — capture id and call_id for function_calls
@@ -87,12 +87,11 @@ export default async function* (
 
 				case 'response.completed':
 					// chunk.response.usage has token counts
-					;(usage.inputTokens += chunk.response.usage?.inputTokens ?? 0),
-						(usage.outputTokens +=
-							chunk.response.usage?.outputTokens ?? 0),
+					;((usage.inputTokens += chunk.response.usage?.inputTokens ?? 0),
+						(usage.outputTokens += chunk.response.usage?.outputTokens ?? 0),
 						(usage.totalTokens += chunk.response.usage?.totalTokens ?? 0),
 						// chunk.response.model has the resolved model name
-						(resolvedModel = chunk.response.model || model)
+						(resolvedModel = chunk.response.model || model))
 					break
 			}
 		}
@@ -119,7 +118,7 @@ export default async function* (
 						yield {
 							type: 'tool',
 							delta: toolChunk.toSave,
-							model: resolvedModel
+							model: resolvedModel,
 						}
 					}
 
@@ -128,7 +127,7 @@ export default async function* (
 							type: 'function_call_output',
 							id: tc.callId,
 							callId: tc.callId,
-							output: toolChunk.result
+							output: toolChunk.result,
 						})
 
 						break
@@ -142,7 +141,7 @@ export default async function* (
 					type: 'function_call_output',
 					id: tc.callId,
 					callId: tc.callId,
-					output: '[ERROR] ' + errorMessage
+					output: '[ERROR] ' + errorMessage,
 				})
 			}
 		}
@@ -153,7 +152,7 @@ export default async function* (
 		text: fullText,
 		provider: 'openrouter',
 		model: resolvedModel,
-		usage
+		usage,
 	}
 }
 

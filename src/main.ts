@@ -1,18 +1,18 @@
 import {
-	PluginSettings,
-	setPluginSetting,
-	loadSavedKeys
-} from './helpers/pluginSettings'
-import { addIcon, removeIcon } from './sidebar'
-import {
 	PLUGIN_ID,
 	CHAT_HISTORY_KEYS,
 	AI_SETTINGS_STORAGE_KEY,
-	LAST_ACTIVE_CHAT_HISTORY_KEY
+	LAST_ACTIVE_CHAT_HISTORY_KEY,
 } from './configs/constants'
-import { aiSettings, loadAiSettingsFromLocalStorage } from './chats/settings'
-import { deleteAllChatHistory } from './chats/history/chatHistory'
-import { Provider } from './chats/types'
+import {
+	PluginSettings,
+	setPluginSetting,
+	loadSavedKeys,
+} from './helpers/pluginSettings'
+import {aiSettings, loadAiSettingsFromLocalStorage} from './chats/settings'
+import {deleteAllChatHistory} from './chats/history/chatHistory'
+import {addIcon, removeIcon} from './sidebar'
+import {Provider} from './chats/types'
 
 function clg(...messages: unknown[]) {
 	let newMsg = ''
@@ -66,7 +66,7 @@ if (window.acode) {
 			text: `${modelLabel} API Key`,
 			prompt: `Enter your ${modelLabel} API Key`,
 			promptType: 'text',
-			value: maskedApiKey
+			value: maskedApiKey,
 		})
 	}
 
@@ -75,7 +75,7 @@ if (window.acode) {
 		async (
 			baseUrl: string,
 			_$page: Acode.WCPage,
-			_options: Acode.PluginInitOptions
+			_options: Acode.PluginInitOptions,
 		) => {
 			// const { cacheFile, cacheFileUrl } = options
 
@@ -91,8 +91,8 @@ if (window.acode) {
 			cb: (key: string, value: unknown) => {
 				setPluginSetting(key as keyof PluginSettings, String(value))
 				aiSettings.apiKeys[key as Provider] = String(value)
-			}
-		}
+			},
+		},
 	)
 
 	acode.setPluginUnmount(PLUGIN_ID, () => {

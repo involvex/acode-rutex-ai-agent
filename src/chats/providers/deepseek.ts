@@ -1,6 +1,6 @@
+import {StreamChunk, ChatMessage} from '../types'
+import {aiSettings} from '../settings'
 import OpenAI from 'openai'
-import { aiSettings } from '../settings'
-import { StreamChunk, ChatMessage } from '../types'
 
 // ─────────────────────────────────────────────
 // DeepSeek  (OpenAI-compatible)
@@ -11,12 +11,12 @@ import { StreamChunk, ChatMessage } from '../types'
 export default async function* (
 	model: string,
 	messages: ChatMessage[],
-	signal?: AbortSignal
+	signal?: AbortSignal,
 ): AsyncGenerator<StreamChunk> {
 	const client = new OpenAI({
 		apiKey: aiSettings.apiKeys.deepseek,
 		baseURL: 'https://api.deepseek.com',
-		dangerouslyAllowBrowser: true
+		dangerouslyAllowBrowser: true,
 	})
 
 	const stream = await client.chat.completions.create(
@@ -26,11 +26,11 @@ export default async function* (
 			max_tokens: aiSettings.maxTokens,
 			stream: true,
 			messages: [
-				{ role: 'system', content: aiSettings.systemInstruction },
-				...messages.map(m => ({ role: m.role, content: m.content }) as any)
-			]
+				{role: 'system', content: aiSettings.systemInstruction},
+				...messages.map(m => ({role: m.role, content: m.content}) as any),
+			],
 		},
-		{ signal }
+		{signal},
 	)
 
 	let fullText = ''
@@ -44,7 +44,7 @@ export default async function* (
 		const delta = chunk.choices[0]?.delta?.content ?? ''
 		if (delta) {
 			fullText += delta
-			yield { type: 'text', delta, model }
+			yield {type: 'text', delta, model}
 		}
 	}
 
@@ -53,16 +53,16 @@ export default async function* (
 
 		const estimatedInputTokens = Math.max(
 			1,
-			Math.ceil(fullText.length / CHARS_PER_ESTIMATED_TOKEN)
+			Math.ceil(fullText.length / CHARS_PER_ESTIMATED_TOKEN),
 		)
 		const estimatedOutputTokens = Math.max(
 			1,
-			Math.ceil(fullText.length / CHARS_PER_ESTIMATED_TOKEN)
+			Math.ceil(fullText.length / CHARS_PER_ESTIMATED_TOKEN),
 		)
 		return {
 			inputTokens: estimatedInputTokens,
 			outputTokens: estimatedOutputTokens,
-			totalTokens: estimatedInputTokens + estimatedOutputTokens
+			totalTokens: estimatedInputTokens + estimatedOutputTokens,
 		}
 	}
 
@@ -72,6 +72,6 @@ export default async function* (
 		text: fullText,
 		provider: 'deepseek',
 		model: resolvedModel,
-		usage: calculateUsage()
+		usage: calculateUsage(),
 	}
 }

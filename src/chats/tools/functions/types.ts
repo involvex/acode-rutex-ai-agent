@@ -64,14 +64,14 @@ export type ToolsFunction = (
 		| EditFileInfo
 		| CreateFileInfo
 		| CreateDirInfo
-		| EditedFilesHistoryProps
+		| EditedFilesHistoryProps,
 ) => AsyncGenerator<ToolsReturnType>
 
 export type DisplayToolsCallUsed =
-	| { header: string }
+	| {header: string}
 	| {
-		path: string
-		editedFileHistoryId: string
-		totalAdded: number
-		totalRemoved: number
-	}
+			path: string
+			editedFileHistoryId: string
+			totalAdded: number
+			totalRemoved: number
+	  }

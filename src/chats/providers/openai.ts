@@ -1,8 +1,8 @@
+import {tools as ollamaTools} from '../tools/ollama_tools'
+import {Usage, StreamChunk, ChatMessage} from '../types'
+import {ToolsFunction} from '../tools/functions/types'
+import {aiSettings} from '../settings'
 import OpenAI from 'openai'
-import { aiSettings } from '../settings'
-import { ToolsFunction } from '../tools/functions/types'
-import { tools as ollamaTools } from '../tools/ollama_tools'
-import { Usage, StreamChunk, ChatMessage } from '../types'
 
 // ─────────────────────────────────────────────
 // OpenAI
@@ -13,11 +13,11 @@ import { Usage, StreamChunk, ChatMessage } from '../types'
 export default async function* (
 	model: string,
 	messages: ChatMessage[],
-	signal?: AbortSignal
+	signal?: AbortSignal,
 ): AsyncGenerator<StreamChunk> {
 	const config: any = {
 		apiKey: aiSettings.apiKeys.openai,
-		dangerouslyAllowBrowser: true
+		dangerouslyAllowBrowser: true,
 	}
 
 	if (String(aiSettings.openaiHost).length > 0)
@@ -28,18 +28,18 @@ export default async function* (
 	// Keep incoming history plain; tool state is built only inside this loop.
 	const input: any[] = messages
 		.filter(m => m.role !== 'tool')
-		.map(m => ({ role: m.role, content: m.content }))
+		.map(m => ({role: m.role, content: m.content}))
 
 	const openaiTools = ollamaTools.map(tool => ({
 		type: 'function' as const,
 		name: tool.function.name,
 		description: tool.function.description,
 		parameters: tool.function.parameters,
-		strict: false
+		strict: false,
 	}))
 
 	let fullText = ''
-	let usage: Usage = { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
+	let usage: Usage = {inputTokens: 0, outputTokens: 0, totalTokens: 0}
 	let resolvedModel = model
 
 	while (true) {
@@ -54,9 +54,9 @@ export default async function* (
 				parallel_tool_calls: true,
 				tool_choice: 'auto',
 				tools: openaiTools,
-				input
+				input,
 			},
-			{ signal }
+			{signal},
 		)
 
 		resolvedModel = response?.model ?? resolvedModel
@@ -66,10 +66,8 @@ export default async function* (
 				inputTokens:
 					response.usage.input_tokens ?? response.usage.prompt_tokens ?? 0,
 				outputTokens:
-					response.usage.output_tokens ??
-					response.usage.completion_tokens ??
-					0,
-				totalTokens: response.usage.total_tokens ?? 0
+					response.usage.output_tokens ?? response.usage.completion_tokens ?? 0,
+				totalTokens: response.usage.total_tokens ?? 0,
 			}
 		}
 
@@ -77,12 +75,12 @@ export default async function* (
 
 		if (turnText) {
 			fullText += turnText
-			yield { type: 'text', model: resolvedModel, delta: turnText }
+			yield {type: 'text', model: resolvedModel, delta: turnText}
 		}
 
 		const toolCalls = Array.isArray(response?.output)
 			? response.output.filter(
-					(item: any) => item?.type === 'function_call' && item?.name
+					(item: any) => item?.type === 'function_call' && item?.name,
 				)
 			: []
 
@@ -111,7 +109,7 @@ export default async function* (
 						yield {
 							type: 'tool',
 							delta: toolChunk.toSave,
-							model: resolvedModel
+							model: resolvedModel,
 						}
 					}
 
@@ -124,7 +122,7 @@ export default async function* (
 				input.push({
 					type: 'function_call_output',
 					call_id: call.call_id,
-					output: resultContent || '[NO RESULT]'
+					output: resultContent || '[NO RESULT]',
 				})
 			} catch (e: any) {
 				const errorMessage =
@@ -133,7 +131,7 @@ export default async function* (
 				input.push({
 					type: 'function_call_output',
 					call_id: call.call_id,
-					output: `[ERROR] ${errorMessage}`
+					output: `[ERROR] ${errorMessage}`,
 				})
 			}
 		}
@@ -144,7 +142,7 @@ export default async function* (
 		text: fullText,
 		provider: 'openai',
 		model: resolvedModel,
-		usage
+		usage,
 	}
 }
 

@@ -1,11 +1,11 @@
-import { getElement, doc } from './utils'
 import {
 	aiSettings,
 	formatTokenNumber,
-	saveAiSettingsToLocalStorage
+	saveAiSettingsToLocalStorage,
 } from '../chats/settings'
-import { Provider } from '../chats/types'
-import { ProviderModelMeta } from '../chats/models/types'
+import {ProviderModelMeta} from '../chats/models/types'
+import {Provider} from '../chats/types'
+import {getElement, doc} from './utils'
 
 const DROPDOWN_PROVIDERS = [
 	'openai',
@@ -13,7 +13,7 @@ const DROPDOWN_PROVIDERS = [
 	'claude',
 	'gemini',
 	'openrouter',
-	'qwen'
+	'qwen',
 ] as const satisfies readonly Provider[]
 
 type DropdownProvider = (typeof DROPDOWN_PROVIDERS)[number]
@@ -43,95 +43,95 @@ export const settingsContainer = (container: HTMLElement) => {
 	const selBtn = getElement<HTMLButtonElement>(container, '#sel-btn')
 	const settingsCloseBtn = getElement<HTMLButtonElement>(
 		container,
-		'#settings-close-btn'
+		'#settings-close-btn',
 	)
 	const providerInput = getElement<HTMLSelectElement>(
 		container,
-		'#setting-provider'
+		'#setting-provider',
 	)
 	const maxTokensInput = getElement<HTMLInputElement>(
 		container,
-		'#setting-max-tokens'
+		'#setting-max-tokens',
 	)
 	const temperatureInput = getElement<HTMLInputElement>(
 		container,
-		'#setting-temperature'
+		'#setting-temperature',
 	)
 	const lifetimeTokensEl = getElement<HTMLElement>(
 		container,
-		'#setting-lifetime-tokens'
+		'#setting-lifetime-tokens',
 	)
 	const modelOpenAITrigger = getElement<HTMLButtonElement>(
 		container,
-		'#setting-model-openai-btn'
+		'#setting-model-openai-btn',
 	)
 	const customModelOpenaiInput = getElement<HTMLInputElement>(
 		container,
-		'#setting-custom-model-openai'
+		'#setting-custom-model-openai',
 	)
 	const openAIHostInput = getElement<HTMLInputElement>(
 		container,
-		'#setting-openai-host'
+		'#setting-openai-host',
 	)
 	const modelDeepSeekTrigger = getElement<HTMLButtonElement>(
 		container,
-		'#setting-model-deepseek-btn'
+		'#setting-model-deepseek-btn',
 	)
 	const modelClaudeTrigger = getElement<HTMLButtonElement>(
 		container,
-		'#setting-model-claude-btn'
+		'#setting-model-claude-btn',
 	)
 	const modelGeminiTrigger = getElement<HTMLButtonElement>(
 		container,
-		'#setting-model-gemini-btn'
+		'#setting-model-gemini-btn',
 	)
 	const modelQwenTrigger = getElement<HTMLButtonElement>(
 		container,
-		'#setting-model-qwen-btn'
+		'#setting-model-qwen-btn',
 	)
 	const modelOllamaInput = getElement<HTMLInputElement>(
 		container,
-		'#setting-model-ollama'
+		'#setting-model-ollama',
 	)
 	const modelOpenRouterTrigger = getElement<HTMLButtonElement>(
 		container,
-		'#setting-model-openrouter-btn'
+		'#setting-model-openrouter-btn',
 	)
 	const modelInfoOpenAI = getElement<HTMLElement>(
 		container,
-		'#setting-model-info-openai'
+		'#setting-model-info-openai',
 	)
 	const modelInfoDeepSeek = getElement<HTMLElement>(
 		container,
-		'#setting-model-info-deepseek'
+		'#setting-model-info-deepseek',
 	)
 	const modelInfoClaude = getElement<HTMLElement>(
 		container,
-		'#setting-model-info-claude'
+		'#setting-model-info-claude',
 	)
 	const modelInfoGemini = getElement<HTMLElement>(
 		container,
-		'#setting-model-info-gemini'
+		'#setting-model-info-gemini',
 	)
 	const modelInfoQwen = getElement<HTMLElement>(
 		container,
-		'#setting-model-info-qwen'
+		'#setting-model-info-qwen',
 	)
 	const modelInfoOpenRouter = getElement<HTMLElement>(
 		container,
-		'#setting-model-info-openrouter'
+		'#setting-model-info-openrouter',
 	)
 	const ollamaHostInput = getElement<HTMLInputElement>(
 		container,
-		'#setting-ollama-host'
+		'#setting-ollama-host',
 	)
 	const openRouterSiteUrlInput = getElement<HTMLInputElement>(
 		container,
-		'#setting-openrouter-site-url'
+		'#setting-openrouter-site-url',
 	)
 	const openRouterSiteNameInput = getElement<HTMLInputElement>(
 		container,
-		'#setting-openrouter-site-name'
+		'#setting-openrouter-site-name',
 	)
 
 	const modelTriggers: Record<DropdownProvider, HTMLButtonElement> = {
@@ -140,7 +140,7 @@ export const settingsContainer = (container: HTMLElement) => {
 		claude: modelClaudeTrigger,
 		gemini: modelGeminiTrigger,
 		qwen: modelQwenTrigger,
-		openrouter: modelOpenRouterTrigger
+		openrouter: modelOpenRouterTrigger,
 	}
 
 	const modelInfoEls: Record<DropdownProvider, HTMLElement> = {
@@ -149,7 +149,7 @@ export const settingsContainer = (container: HTMLElement) => {
 		claude: modelInfoClaude,
 		gemini: modelInfoGemini,
 		qwen: modelInfoQwen,
-		openrouter: modelInfoOpenRouter
+		openrouter: modelInfoOpenRouter,
 	}
 
 	let settingsDialogOpen = false
@@ -167,11 +167,11 @@ export const settingsContainer = (container: HTMLElement) => {
 
 	const modelSearchInput = getElement<HTMLInputElement>(
 		modelMenuEl,
-		'.model-search-input'
+		'.model-search-input',
 	)
 	const modelSearchOptions = getElement<HTMLElement>(
 		modelMenuEl,
-		'.model-search-options'
+		'.model-search-options',
 	)
 
 	const escapeHtml = (value: string): string => {
@@ -182,7 +182,7 @@ export const settingsContainer = (container: HTMLElement) => {
 
 	const findModelMeta = (
 		provider: Provider,
-		modelId: string
+		modelId: string,
 	): ProviderModelMeta | null => {
 		if (!modelId.trim()) return null
 		return (
@@ -215,10 +215,10 @@ export const settingsContainer = (container: HTMLElement) => {
          <div><strong>Best for:</strong></div>
          <ul>${bestFor}</ul>
          ${
-         	modelMeta.notes
-         		? `<div><strong>Notes:</strong> ${escapeHtml(modelMeta.notes)}</div>`
-         		: ''
-         }
+						modelMeta.notes
+							? `<div><strong>Notes:</strong> ${escapeHtml(modelMeta.notes)}</div>`
+							: ''
+					}
       `
 	}
 
@@ -229,30 +229,27 @@ export const settingsContainer = (container: HTMLElement) => {
 		temperatureInput.value = String(aiSettings.temperature)
 		modelOpenAITrigger.textContent = getModelLabel(
 			'openai',
-			aiSettings.models.openai
+			aiSettings.models.openai,
 		)
 		openAIHostInput.value = aiSettings.openaiHost
 		customModelOpenaiInput.value = aiSettings.models.openai
 		modelDeepSeekTrigger.textContent = getModelLabel(
 			'deepseek',
-			aiSettings.models.deepseek
+			aiSettings.models.deepseek,
 		)
 		modelClaudeTrigger.textContent = getModelLabel(
 			'claude',
-			aiSettings.models.claude
+			aiSettings.models.claude,
 		)
 		modelGeminiTrigger.textContent = getModelLabel(
 			'gemini',
-			aiSettings.models.gemini
+			aiSettings.models.gemini,
 		)
-		modelQwenTrigger.textContent = getModelLabel(
-			'qwen',
-			aiSettings.models.qwen
-		)
+		modelQwenTrigger.textContent = getModelLabel('qwen', aiSettings.models.qwen)
 		modelOllamaInput.value = aiSettings.models.ollama
 		modelOpenRouterTrigger.textContent = getModelLabel(
 			'openrouter',
-			aiSettings.models.openrouter
+			aiSettings.models.openrouter,
 		)
 		renderModelInfo('openai')
 		renderModelInfo('deepseek')
@@ -264,7 +261,7 @@ export const settingsContainer = (container: HTMLElement) => {
 		openRouterSiteUrlInput.value = aiSettings.openRouterSiteUrl
 		openRouterSiteNameInput.value = aiSettings.openRouterSiteName
 		lifetimeTokensEl.textContent = formatTokenNumber(
-			aiSettings.lifetimeTokensUsed
+			aiSettings.lifetimeTokensUsed,
 		)
 	}
 
@@ -324,7 +321,7 @@ export const settingsContainer = (container: HTMLElement) => {
 		const fromTop = triggerRect.top < panelRect.top + panelRect.height / 2
 		const left = Math.min(
 			Math.max(triggerRect.left - panelRect.left, 4),
-			Math.max(panelRect.width - 224, 4)
+			Math.max(panelRect.width - 224, 4),
 		)
 
 		modelMenuEl.style.left = `${left}px`
@@ -339,7 +336,7 @@ export const settingsContainer = (container: HTMLElement) => {
 
 	const openModelMenu = (
 		provider: DropdownProvider,
-		trigger: HTMLButtonElement
+		trigger: HTMLButtonElement,
 	): void => {
 		modelMenuProvider = provider
 		modelMenuTrigger = trigger
@@ -371,7 +368,7 @@ export const settingsContainer = (container: HTMLElement) => {
 		value: string,
 		min: number,
 		max: number,
-		fallback: number
+		fallback: number,
 	): number => {
 		const parsed = Number(value)
 		if (!Number.isFinite(parsed)) return fallback
@@ -393,7 +390,7 @@ export const settingsContainer = (container: HTMLElement) => {
 
 	maxTokensInput.addEventListener('change', () => {
 		aiSettings.maxTokens = Math.round(
-			clampNumber(maxTokensInput.value, 1, 1000000, aiSettings.maxTokens)
+			clampNumber(maxTokensInput.value, 1, 1000000, aiSettings.maxTokens),
 		)
 		persistSettings()
 	})
@@ -403,14 +400,14 @@ export const settingsContainer = (container: HTMLElement) => {
 			temperatureInput.value,
 			0,
 			1,
-			aiSettings.temperature
+			aiSettings.temperature,
 		)
 		persistSettings()
 	})
 
 	DROPDOWN_PROVIDERS.forEach(provider => {
 		modelTriggers[provider].addEventListener('click', () =>
-			openModelMenu(provider, modelTriggers[provider])
+			openModelMenu(provider, modelTriggers[provider]),
 		)
 	})
 
@@ -468,7 +465,7 @@ export const settingsContainer = (container: HTMLElement) => {
 			}
 			closeModelMenu()
 		},
-		true
+		true,
 	)
 
 	selBtn.disabled = false

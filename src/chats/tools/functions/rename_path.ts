@@ -1,12 +1,12 @@
-import { RenameFileInfo } from './types'
-import { getRelativePath } from './utils'
+import {getRelativePath} from './utils'
+import {RenameFileInfo} from './types'
 
-export default async function* ({ uri, new_name }: RenameFileInfo) {
+export default async function* ({uri, new_name}: RenameFileInfo) {
 	// --- SEND SIGNAL TO PANEL THAT FILE IS BEING READ ---
 	const relativePath = getRelativePath(uri)
 
 	const toolCalling = JSON.stringify({
-		header: `RENAMED: ${relativePath} -> ${new_name}`
+		header: `RENAMED: ${relativePath} -> ${new_name}`,
 	})
 	const toSave = `<system_injected_preview>${toolCalling}</system_injected_preview>`
 
@@ -21,5 +21,5 @@ export default async function* ({ uri, new_name }: RenameFileInfo) {
 
 	const result = await fs(uri).renameTo(new_name)
 
-	yield { result, toSave }
+	yield {result, toSave}
 }

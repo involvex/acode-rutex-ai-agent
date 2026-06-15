@@ -9,8 +9,8 @@
  * final usage stats. Pass an AbortController signal to support a stop button.
  */
 
-import { aiSettings } from './settings'
-import { StreamChunk, StreamFunction, ChatMessage } from './types'
+import {StreamChunk, StreamFunction, ChatMessage} from './types'
+import {aiSettings} from './settings'
 
 // ─────────────────────────────────────────────
 // Main entry point — async generator
@@ -44,9 +44,9 @@ import { StreamChunk, StreamFunction, ChatMessage } from './types'
  */
 export async function* sendChat(
 	messages: ChatMessage[],
-	signal: AbortSignal
+	signal: AbortSignal,
 ): AsyncGenerator<StreamChunk> {
-	const { provider } = aiSettings
+	const {provider} = aiSettings
 	const model = aiSettings.models[provider]
 
 	let StreamModel: StreamFunction
@@ -70,7 +70,7 @@ export async function example() {
 		'You are a senior software engineer. Be concise.'
 
 	const messages: ChatMessage[] = [
-		{ role: 'user', content: 'Explain recursion in one sentence.' }
+		{role: 'user', content: 'Explain recursion in one sentence.'},
 	]
 
 	// ── Basic streaming ──────────────────────────
@@ -87,7 +87,7 @@ export async function example() {
 			} else if (chunk.type === 'done') {
 				clg(`\n\n[${chunk.provider} / ${chunk.model}]`)
 				clg(
-					`Tokens — in: ${chunk.usage.inputTokens}, out: ${chunk.usage.outputTokens}`
+					`Tokens — in: ${chunk.usage.inputTokens}, out: ${chunk.usage.outputTokens}`,
 				)
 			} else {
 				clg('Nothing from stream result', chunk)

@@ -1,5 +1,5 @@
-import { Provider } from './types'
-import { AI_SETTINGS_STORAGE_KEY, NEW_LINE_TEXT } from '../configs/constants'
+import {AI_SETTINGS_STORAGE_KEY, NEW_LINE_TEXT} from '../configs/constants'
+import {Provider} from './types'
 
 // ─────────────────────────────────────────────
 // Global settings — edit this object to configure everything
@@ -80,7 +80,7 @@ export const aiSettings: AISettings = {
 		deepseek: 'deepseek-chat', // deepseek-reasoner (thinking/CoT mode)
 		qwen: 'qwen3-coder-plus', // qwen3.5
 		ollama: 'qwen3.5', // any model pulled locally
-		openrouter: 'qwen/qwen3-coder' // <provider>/<model> — 300+ available
+		openrouter: 'qwen/qwen3-coder', // <provider>/<model> — 300+ available
 	},
 
 	// ── API keys ─────────────────────────────────
@@ -91,7 +91,7 @@ export const aiSettings: AISettings = {
 		deepseek: '',
 		qwen: '',
 		ollama: '',
-		openrouter: ''
+		openrouter: '',
 	},
 
 	// ── Provider Labels ─────────────────────────────────
@@ -102,7 +102,7 @@ export const aiSettings: AISettings = {
 		deepseek: 'DeepSeek',
 		qwen: 'Qwen',
 		ollama: 'Ollama',
-		openrouter: 'OpenRouter'
+		openrouter: 'OpenRouter',
 	},
 
 	// ── System instruction ───────────────────────
@@ -153,20 +153,20 @@ Note: Ignore <system_injected_preview> tags in history; these are UI-only and no
 	openRouterSiteName: '',
 
 	// ── Aggregated usage ───────────────────────────
-	lifetimeTokensUsed: 0
+	lifetimeTokensUsed: 0,
 }
 
 export const saveAiSettingsToLocalStorage = (): void => {
 	const persistable: PersistedAISettings = {
 		provider: aiSettings.provider,
-		models: { ...aiSettings.models },
+		models: {...aiSettings.models},
 		temperature: aiSettings.temperature,
 		maxTokens: aiSettings.maxTokens,
 		ollamaHost: aiSettings.ollamaHost,
 		openaiHost: aiSettings.openaiHost,
 		openRouterSiteUrl: aiSettings.openRouterSiteUrl,
 		openRouterSiteName: aiSettings.openRouterSiteName,
-		lifetimeTokensUsed: aiSettings.lifetimeTokensUsed
+		lifetimeTokensUsed: aiSettings.lifetimeTokensUsed,
 	}
 	localStorage.setItem(AI_SETTINGS_STORAGE_KEY, JSON.stringify(persistable))
 }
@@ -207,7 +207,7 @@ export const loadAiSettingsFromLocalStorage = (): void => {
 		if (lifetimeTokensUsed !== null) {
 			aiSettings.lifetimeTokensUsed = Math.max(
 				0,
-				Math.round(lifetimeTokensUsed)
+				Math.round(lifetimeTokensUsed),
 			)
 		}
 	} catch {
@@ -219,7 +219,7 @@ export const addLifetimeTokens = (usedTokens: number): void => {
 	if (!Number.isFinite(usedTokens)) return
 	aiSettings.lifetimeTokensUsed = Math.max(
 		0,
-		Math.round(aiSettings.lifetimeTokensUsed + usedTokens)
+		Math.round(aiSettings.lifetimeTokensUsed + usedTokens),
 	)
 	saveAiSettingsToLocalStorage()
 }

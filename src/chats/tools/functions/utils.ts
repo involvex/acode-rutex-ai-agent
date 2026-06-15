@@ -1,6 +1,6 @@
 export const getRelativePath = (
 	path: string,
-	showWorkspaceTitle: boolean = true
+	showWorkspaceTitle: boolean = true,
 ): string => {
 	let relativePath = path
 

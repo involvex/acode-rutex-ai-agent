@@ -1,6 +1,6 @@
+import {StreamChunk, ChatMessage} from '../types'
 import Anthropic from '@anthropic-ai/sdk'
-import { aiSettings } from '../settings'
-import { StreamChunk, ChatMessage } from '../types'
+import {aiSettings} from '../settings'
 
 // ─────────────────────────────────────────────
 // Claude
@@ -9,11 +9,11 @@ import { StreamChunk, ChatMessage } from '../types'
 export default async function* (
 	model: string,
 	messages: ChatMessage[],
-	signal?: AbortSignal
+	signal?: AbortSignal,
 ): AsyncGenerator<StreamChunk> {
 	const client = new Anthropic({
 		apiKey: aiSettings.apiKeys.claude,
-		dangerouslyAllowBrowser: true
+		dangerouslyAllowBrowser: true,
 	})
 
 	const stream = await client.messages.stream({
@@ -21,8 +21,8 @@ export default async function* (
 		max_tokens: aiSettings.maxTokens,
 		temperature: aiSettings.temperature,
 		system: aiSettings.systemInstruction,
-		messages: messages.map(m => ({ role: m.role, content: m.content }) as any),
-		signal
+		messages: messages.map(m => ({role: m.role, content: m.content}) as any),
+		signal,
 	})
 
 	let fullText = ''
@@ -36,7 +36,7 @@ export default async function* (
 		) {
 			const delta = event.delta.text
 			fullText += delta
-			yield { type: 'text', delta, model }
+			yield {type: 'text', delta, model}
 		}
 	}
 
@@ -51,7 +51,7 @@ export default async function* (
 		usage: {
 			inputTokens: final.usage.input_tokens,
 			outputTokens: final.usage.output_tokens,
-			totalTokens: final.usage.input_tokens + final.usage.output_tokens
-		}
+			totalTokens: final.usage.input_tokens + final.usage.output_tokens,
+		},
 	}
 }
